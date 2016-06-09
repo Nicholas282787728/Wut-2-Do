@@ -7,7 +7,7 @@ Algorithm for storing data into database:
   By using Radar Search/Text Search (Google Places API), pass in the "categories" String[] to generate in rows: "category, shop name, shop address" of the locations. (refer to place_search.php)
   Output the shop names and shop addresses into a .txt file. (create a new php file. add into functions)?
   By looping through the category name and shop name, use SQL to generate the category id from the category name. Then input both the category id and shop name. This will generate the "located_at" table. (create function to read the category and generate id).
-  Use Java API such as Pattern and Matcher to split the address up into the respective fields (unit_no, building_name, building_address, postal_code) and output it into .txt (refer to Converter.java)
+  Use Java API such as Pattern and Matcher to split the address up into the respective fields (unit_no, building_name, building_address, postal_code) and output it into .txt (refer to Converter.java) else, can also immediately put it into an ArrayList and transfer to database.
   From the .txt file, use SQL and PHP to transfer the data into database.
   
   How to generate list of buildings? // tentatively, from shop names, generate it. If repeated names, delete.
