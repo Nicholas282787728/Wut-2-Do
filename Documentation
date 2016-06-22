@@ -35,3 +35,7 @@ The full address might result in location from other country instead.
 Linking between Android and PHP database
 When switching activity, the keyword will be passed along to the next page and be appended to a PHP URL so that the required information can be downloaded i.e GET method.
 GET method is used as the data sent over to the database is not required to be secure.
+
+Database
+Includes latitude & longitude in the table 'building'.
+To facilitate generating the distance between user and the locations. 
