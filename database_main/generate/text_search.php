@@ -56,7 +56,8 @@ function textSearchAPI($file, &$allResults){
 				// pass them to various functions to retrieve postal code and unit no.
 				$postal_code = findPostal($value['formatted_address']);
 				$unit_no = findUnit($value['formatted_address']);
-				array_push($allResults, $value['name'], $value['formatted_address'], $postal_code, $unit_no);
+				$lat_long = findCoordinates($postal_code);
+				array_push($allResults, $value['name'], $value['formatted_address'], $postal_code, $unit_no, $lat_long);
 			}
 		}
 
@@ -113,5 +114,18 @@ function findUnit($address){
 	}
 	else
 		return "";
+}
+
+// returns coordinates from the given postal code
+function findCoordinates($postal_code){
+	$link = "https://maps.googleapis.com/maps/api/geocode/json?address=" . "$postal_code" . "&key=AIzaSyDNXW5YCSJ31sIW1rxg8SW77BQ_b89I6qQ&components=country:SG";
+	$handle = file_get_contents($link);
+	$data = json_decode($handle, true);	
+
+	$results = $data['results'][0];
+	$location = $results['geometry']['location'];
+	$lat_long = $location['lat'] . ',' . $location['lng'] . "\n";
+	
+	return $lat_long;	
 }
 ?>

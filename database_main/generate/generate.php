@@ -9,11 +9,11 @@ include "insert_database.php";
 
 <?php
 $genres = array( 
-/*	"Movie" => array (
+	"Movie" => array (
 		"Cinema" => array(
 			"Cinema"
 			),
-		),*/
+		),
 	"Sports" => array (
 		"Gym" => array(
 			"Gym"
@@ -28,14 +28,14 @@ $genres = array(
 			"Snorkel"
 			),
 		),
-/*	"Games" => array (
+	"Games" => array (
 		"Cybercafe" => array(
 			"Cybercafe", "Lan Shop"
 			),
 		"Board Games" => array(
 			"Board Games"
 			),
-		),*/
+		),
 	"Puzzle" => array (
 		"Escape Room" => array(
 			"Escape Room"

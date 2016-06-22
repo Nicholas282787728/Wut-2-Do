@@ -19,17 +19,19 @@ function insertDatabase($results, $gen_id, $category){
 		$i++;
 		$unit_no = trim($results[$i]);
 		$i++;
-		createMain($shop_name, $address, $postal_code, $unit_no, $cat_id);
+		$lat_long = trim($results[$i]);
+		$i++;
+		createMain($shop_name, $address, $postal_code, $unit_no, $lat_long, $cat_id);
 	}
 }
 
 // creates 'details_of_activity_located_in', 'building' and 'located_at'
-function createMain($shop_name, $address, $postal_code, $unit_no, $cat_id){
+function createMain($shop_name, $address, $postal_code, $unit_no, $lat_long, $cat_id){
 	global $connection;
 
 	// insert into 'building'
-	$query="INSERT IGNORE INTO building(name, postal_code) ";
-	$query.="VALUE('$address', '$postal_code')";
+	$query="INSERT IGNORE INTO building(name, postal_code, lat_long) ";
+	$query.="VALUE('$address', '$postal_code', '$lat_long')";
 	// input the query
 	$result=mysqli_query($connection, $query);
 	if(!$result){
