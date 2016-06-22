@@ -20,6 +20,10 @@ Database
 Migrated from freesqldatabase.com to 000webhost.com
 000webhost.com allows for domain hosting and uploading of .php files. This allows the Android app to retrieve data from database.
 
-Generating database
+Database
 Using Text Search API instead of Radar Search
 Radar Search, though it can generate up to 200 results (compared to Text Search, which can generate only up to 60 results), but the results generated can be quite inaccurate. As such, the plan now is to use Text Search API and loop through all the MRT stations in Singapore, so that it is less likely to hit the maximum of 60 results. 
+
+Database
+'Search' only supports town locations i.e 'Pasir Ris' etc
+Many locations are not located in a particular building. Also, lack of knowledge on how to retrieve the building name from address.
