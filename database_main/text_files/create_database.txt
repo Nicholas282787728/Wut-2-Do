@@ -1,0 +1,65 @@
+CREATE TABLE genre
+(id INTEGER AUTO_INCREMENT,
+name VARCHAR(24) UNIQUE,
+PRIMARY KEY(id));
+
+CREATE TABLE category
+(id INTEGER AUTO_INCREMENT,
+name VARCHAR(24) UNIQUE,
+PRIMARY KEY(id));
+
+CREATE TABLE contains
+(gen_id INTEGER,
+cat_id INTEGER,
+PRIMARY KEY(gen_id, cat_id),
+FOREIGN KEY(gen_id) REFERENCES genre(id),
+FOREIGN KEY(cat_id) REFERENCES category(id));
+
+CREATE TABLE building
+(id INTEGER AUTO_INCREMENT,
+name VARCHAR(200),
+address VARCHAR(100),
+postal_code VARCHAR(6),
+PRIMARY KEY(id),
+UNIQUE(name));
+
+CREATE TABLE details_of_activity_located_in
+(shop_name VARCHAR(100),
+unit_no VARCHAR(10),
+build_id INTEGER,
+PRIMARY KEY(unit_no, build_id),
+FOREIGN KEY(build_id) REFERENCES building(id));
+
+CREATE TABLE located_at
+(cat_id INTEGER,
+unit_no VARCHAR(10),
+build_id INTEGER,
+PRIMARY KEY(cat_id, unit_no, build_id),
+FOREIGN KEY(unit_no, build_id) REFERENCES details_of_activity_located_in(unit_no, build_id),
+FOREIGN KEY(cat_id) REFERENCES category(id));
+
+CREATE TABLE age
+(id INTEGER AUTO_INCREMENT,
+category VARCHAR(24),
+PRIMARY KEY(id));
+
+CREATE TABLE for_ages
+(unit_no VARCHAR(10),
+build_id INTEGER,
+age_id INTEGER,
+PRIMARY KEY(unit_no, build_id, age_id),
+FOREIGN KEY(unit_no, build_id) REFERENCES details_of_activity_located_in(unit_no, build_id),
+FOREIGN KEY(age_id) REFERENCES age(id));
+
+CREATE TABLE group_size
+(id INTEGER AUTO_INCREMENT,
+category VARCHAR(24),
+PRIMARY KEY(id));
+
+CREATE TABLE for_groups
+(unit_no VARCHAR(10),
+build_id INTEGER,
+group_id INTEGER,
+PRIMARY KEY(unit_no, build_id, group_id),
+FOREIGN KEY(unit_no, build_id) REFERENCES details_of_activity_located_in(unit_no, build_id),
+FOREIGN KEY(group_id) REFERENCES group_size(id));
