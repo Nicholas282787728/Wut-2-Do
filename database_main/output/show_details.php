@@ -9,8 +9,9 @@ include "functions_output.php";
 
 <?php
 // retrieves all the data in the database
-$result = getDetailsOfActivity(getAndroidCategory());
-
-// output in json format
-echo json_encode($result);
+$category = getAndroidCategory();
+if($category == "all")
+	echo json_encode(getAllDetails(getAndroidLatLong()));
+else
+	echo json_encode(getDetailsOfActivity($category, getAndroidLatLong()));
 ?>

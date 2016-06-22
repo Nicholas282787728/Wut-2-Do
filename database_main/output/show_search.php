@@ -9,7 +9,7 @@ include "functions_output.php";
 
 <?php
 // retrieves all the data in the database
-$result = getSearch(getAndroidSearch());
+$result = getSearch(getAndroidSearch(), getAndroidLatLong());
 // output in json format
 echo json_encode($result);
 ?>
