@@ -27,3 +27,14 @@ Radar Search, though it can generate up to 200 results (compared to Text Search,
 Database
 'Search' only supports town locations i.e 'Pasir Ris' etc
 Many locations are not located in a particular building. Also, lack of knowledge on how to retrieve the building name from address.
+
+Map Activity in Android
+Use only the postal code from the address for geocoding to obtain latitude and longitude.
+The full address might result in location from other country instead.
+
+Linking between Android and PHP database
+When switching activity, the keyword will be passed along to the next page and be appended to a PHP URL so that the required information can be downloaded.
+Different ver of the URL for the different purposes. 
+
+Using the same Result page for both "Searching" and "Genre".
+Addition of if-else condition allows for lesser repeated code and additional Activity page.
