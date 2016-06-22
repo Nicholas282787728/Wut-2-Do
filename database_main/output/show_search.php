@@ -10,11 +10,6 @@ include "functions_output.php";
 <?php
 // retrieves all the data in the database
 $result = getSearch(getAndroidSearch());
-/*if(empty($result)){
-	echo "None found";
-}
-else{*/
-	// output in json format
-	echo json_encode($result);
-//}
+// output in json format
+echo json_encode($result);
 ?>
