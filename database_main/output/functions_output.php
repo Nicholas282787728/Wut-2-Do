@@ -111,6 +111,7 @@ function getDetailsOfActivity($category, $user_lat_long){
 		$details_array[$i]['name'] = $shop_name;
 		$details_array[$i]['address'] = $address;
 		$details_array[$i]['distance'] = $distance;
+		$details_array[$i]['lat_long'] = $lat_long;
 
 		$i++;
 	}
@@ -146,6 +147,7 @@ function getAllDetails($user_lat_long){
 		$details_array[$i]['name'] = $shop_name;
 		$details_array[$i]['address'] = $address;
 		$details_array[$i]['distance'] = $distance;
+		$details_array[$i]['lat_long'] = $lat_long;
 
 		$i++;
 	}
@@ -164,7 +166,6 @@ Table 'category' get 'id' from 'name', using 'cat_id' to get all 'unit_no' and
 returns an array that stores 'shop_name' and 'building_name', given 'category' Android input
 */
 
-// MUST RESOLVE LATER
 function getSearch($search, $user_lat_long){
 	global $connection;
 	// get 'id' and 'name' of the building from database
@@ -193,9 +194,12 @@ function getSearch($search, $user_lat_long){
 				$details_array[$i]['name'] = $row2[0];
 				$details_array[$i]['address'] = $address;
 				$details_array[$i]['distance'] = $distance;
+				$details_array[$i]['lat_long'] = $lat_long;
 				$i++;
 			}
 		}
+		// sort $details_array according to distance from $user_lat_long in ascending order
+		$details_array = sortDistance($details_array);
 		return $details_array;
 	}
 }
@@ -223,6 +227,7 @@ function sortDistance($array){
 		$name[$key]  = $row['name'];
 		$address[$key] = $row['address'];
 		$distance[$key] = $row['distance'];
+		$lat_long[$key] = $row['lat_long'];
 	}
 
 	// Sort the data with $distance ascending
