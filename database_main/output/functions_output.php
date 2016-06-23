@@ -214,7 +214,7 @@ function getDistance($lat_long, $user_lat_long){
 	// $distance value is in meters
 	$distance = $data['rows'][0]['elements'][0]['distance']['value'];
 
-	return $distance;
+	return number_format($distance/1000, 2);
 }
 
 //test case
@@ -224,10 +224,7 @@ function getDistance($lat_long, $user_lat_long){
 function sortDistance($array){
 	// Obtain a list of columns
 	foreach ($array as $key => $row) {
-		$name[$key]  = $row['name'];
-		$address[$key] = $row['address'];
 		$distance[$key] = $row['distance'];
-		$lat_long[$key] = $row['lat_long'];
 	}
 
 	// Sort the data with $distance ascending
