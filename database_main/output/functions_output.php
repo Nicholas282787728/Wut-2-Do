@@ -139,7 +139,7 @@ function getAllDetails($user_lat_long){
 		$result2=mysqli_query($connection, $query);
 		// there is only 1 row since 'build_id' is unique 
 		// and only 1 column since selecting only 'name'
-		$row2 = mysqli_fetch_row($result2);
+		$row2 = mysqli_fetch_assoc($result2);
 		$address=$row2['name'];
 		$lat_long=$row2['lat_long'];
 		$distance=getDistance($lat_long, $user_lat_long);
@@ -156,15 +156,6 @@ function getAllDetails($user_lat_long){
 
 	return $details_array;
 }
-
-/* algorithm:
-Upon receiving the category (by user click), return all the shop names + addresses
-Table 'category' get 'id' from 'name', using 'cat_id' to get all 'unit_no' and 
-'build_id' where 'cat_id'=='id', pass the 'unit_no' and 'build_id' into 
-'details_of_activity_located_in' to get the shop name, and pass 'build_id' into
-'building' to get 'name'.
-returns an array that stores 'shop_name' and 'building_name', given 'category' Android input
-*/
 
 function getSearch($search, $user_lat_long){
 	global $connection;
