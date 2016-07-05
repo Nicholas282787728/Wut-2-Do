@@ -1,5 +1,6 @@
 package com.fishe.wut2dodemo;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
@@ -30,6 +31,7 @@ public class Category extends AppCompatActivity {
     ArrayList<String> itemList;
     String category;
     TextView nameCat;
+    ProgressDialog dialog;
 
     public void settingButton(View view){
 
@@ -101,7 +103,6 @@ public class Category extends AppCompatActivity {
                         extras.putString("name",categoryList.get(position));
                         extras.putString("code","category");
                         i.putExtras(extras);
-
                         startActivity(i);
 
                         Toast.makeText(getApplicationContext(), "Category: " + categoryList.get(position),Toast.LENGTH_LONG).show();
@@ -122,31 +123,46 @@ public class Category extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_category);
 
-        nameCat = (TextView)findViewById(R.id.categoryPg);
+        dialog = new ProgressDialog(this);
+        dialog.setMessage("Downloading information ");
+        dialog.setCancelable(false);
+        dialog.setInverseBackgroundForced(false);
+        dialog.show();
+
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                nameCat = (TextView)findViewById(R.id.categoryPg);
+                category = "";
+                Intent receive = getIntent();
+                category = receive.getStringExtra("name");
+
+                Log.i("Name",category);
+                //display the name as the title
+                nameCat.setText(receive.getStringExtra("name"));
+
+                String url = "http://orbital_wut_2_do.net16.net/show_categories.php?genre="+category;
+                Log.i("URL",url);
+
+                DownloadTask task = new DownloadTask();
+
+                try {
+                    task.execute(url).get();
+
+                } catch (InterruptedException e) {
+                    Log.i("Interrupted",category);
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                    Log.i("Execution",category);
+                }
+
+                dialog.dismiss();
+            }
+        };
+
+        new Thread(runnable).start();
 
 
-        category = "";
-        Intent receive = getIntent();
-        category = receive.getStringExtra("name");
-
-        Log.i("Name",category);
-        //display the name as the title
-        nameCat.setText(receive.getStringExtra("name"));
-
-        String url = "http://orbital_wut_2_do.net16.net/show_categories.php?genre="+category;
-        Log.i("URL",url);
-
-        DownloadTask task = new DownloadTask();
-
-        try {
-            task.execute(url).get();
-
-        } catch (InterruptedException e) {
-            Log.i("Interrupted",category);
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-            Log.i("Execution",category);
-        }
     }
 }
