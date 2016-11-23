@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/miCompose"
+        app:showAsAction="ifRoom"
+        android:icon="@drawable/ic_settings_black_24dp"
+        android:title="Compose">
+        <menu>
+            <item
+                android:id="@+id/mapV"
+                android:title="Map View" />
+            <item
+                android:id="@+id/sortRate"
+                android:title="Sort by Rating" />
+            <item
+                android:id="@+id/sortDis"
+                android:title="Sort by Distance" />
+        </menu>
+
+    </item>
+
+</menu>

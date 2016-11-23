@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/miCompose"
+        app:showAsAction="ifRoom"
+        android:icon="@drawable/ic_more_vert_black_24dp"
+        android:title="Compose">
+        <menu>
+            <item
+                android:id="@+id/credits"
+                android:title="Credits" />
+            <item
+                android:id="@+id/tutorial"
+                android:title="Tutorial" />
+
+        </menu>
+
+    </item>
+
+</menu>

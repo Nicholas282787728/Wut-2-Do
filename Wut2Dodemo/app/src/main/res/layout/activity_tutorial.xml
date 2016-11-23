@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.fishe.wut2dodemo.Tutorial">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Wut 2 Do?"
+        android:id="@+id/titile"
+        android:textSize="70sp"
+        android:singleLine="false"
+        android:textAlignment="textEnd"
+        android:textStyle="bold|italic"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/random"
+        android:onClick="random"
+        android:src="@drawable/random4"
+        android:layout_marginTop="37dp"
+        android:background="@color/white"
+        android:layout_below="@+id/textView13"
+        android:layout_alignStart="@+id/textView15" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/genre"
+        android:src="@drawable/listmain"
+        android:onClick="category"
+        android:background="@color/white"
+        android:layout_alignTop="@+id/search"
+        android:layout_alignEnd="@+id/titile"
+        android:layout_marginEnd="33dp" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/search"
+        android:onClick="search"
+        android:src="@drawable/searchmain"
+        android:layout_marginTop="32dp"
+        android:background="@color/white"
+        android:layout_marginStart="35dp"
+        android:layout_below="@+id/titile"
+        android:layout_alignStart="@+id/titile" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/login"
+        android:onClick="login"
+        android:src="@drawable/loginmain"
+        android:layout_alignTop="@+id/random"
+        android:layout_alignStart="@+id/genre"
+        android:background="@color/white"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=" Search"
+        android:id="@+id/textView13"
+        android:textSize="25sp"
+        android:layout_alignEnd="@+id/search"
+        android:layout_below="@+id/search"
+        android:layout_alignStart="@+id/search" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="   Genre"
+        android:id="@+id/textView14"
+        android:textSize="25sp"
+        android:layout_above="@+id/random"
+        android:layout_alignStart="@+id/genre" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Let&apos;s Play!"
+        android:id="@+id/textView15"
+        android:textSize="25sp"
+        android:layout_below="@+id/login"
+        android:layout_alignStart="@+id/textView13" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="   Login"
+        android:id="@+id/textView16"
+        android:textSize="25sp"
+        android:layout_below="@+id/random"
+        android:layout_alignEnd="@+id/login"
+        android:layout_alignStart="@+id/login" />
+
+
+</RelativeLayout>

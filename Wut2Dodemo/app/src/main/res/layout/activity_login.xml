@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:weightSum="1">
+
+    <TextView
+        android:layout_width="125dp"
+        android:layout_height="41dp"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Log In"
+        android:id="@+id/textView3"
+        android:gravity="center"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
+
+    <EditText
+        android:layout_width="350dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/username"
+        android:hint="User Name"
+        android:layout_below="@+id/textView3"
+        android:layout_centerHorizontal="true"
+        android:maxLines="1"
+        android:singleLine="true"/>
+
+    <EditText
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textPassword"
+        android:hint="Password"
+        android:id="@+id/password"
+        android:layout_below="@+id/username"
+        android:layout_alignEnd="@+id/username"
+        android:layout_alignStart="@+id/username"
+        android:layout_marginTop="30dp"
+        android:maxLines="1"
+        android:singleLine="true"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Log in"
+        android:onClick="attemptLogin"
+        android:id="@+id/login_button"
+        android:layout_below="@+id/password"
+        android:layout_alignEnd="@+id/password" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Don&apos;t have an account yet?"
+        android:id="@+id/textView6"
+        android:layout_marginTop="140dp"
+        android:textColor="#000000"
+        android:textStyle="bold"
+        android:layout_below="@+id/login_button"
+        android:layout_centerHorizontal="true" />
+
+    <Button
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:text="Sign Up"
+        android:id="@+id/signup_button"
+        android:layout_marginTop="0dp"
+        android:layout_below="@+id/textView6"
+        android:layout_centerHorizontal="true"
+        android:onClick="signup"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="After signing up, you&apos;ll be able to add reviews"
+        android:id="@+id/textView7"
+        android:gravity="center"
+        android:textColor="#000000"
+        android:layout_below="@+id/signup_button"
+        android:layout_alignEnd="@+id/signup_button"
+        android:layout_alignStart="@+id/signup_button" />
+
+</RelativeLayout>
