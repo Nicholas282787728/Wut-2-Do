@@ -1,0 +1,424 @@
+15
+Time Zone Watch Trading
+
+250
+15
+Zone X Leisure Pte. Ltd Head Office.
+
+251
+15
+Timezone Active - 112 Katong
+
+75
+15
+Timezone Active - Tampines 1
+
+249
+13
+I.R.C @ Parklane (PI)
+
+182
+13
+I.r.c
+
+239
+13
+The Mind Cafe
+
+216
+5
+Haw Par Villa
+
+47
+5
+Singapore Zoo
+
+10
+18
+Duke-NUS Medical School
+
+310
+18
+Keio-NUS CUTE Center
+02-01-01
+303
+18
+Middle East Institute (NUS)
+
+302
+18
+NUS Architecture
+
+306
+18
+NUS Computing
+
+304
+18
+NUS Electrical & Computer Engineering
+
+305
+18
+NUS High School of Mathematics and Science
+
+311
+18
+NUS Mechanical Engineering
+07-08,
+300
+18
+NUS Medicine Silent Mentors Programme
+
+25
+18
+NUS Press Pte Ltd
+
+309
+18
+NUS Social Work
+04-00
+301
+18
+National University of Singapore
+
+307
+18
+Yale-NUS College
+01-220
+308
+2
+85 Beach Garden Hotel
+
+41
+2
+Beach Cabana
+
+35
+2
+Bora Bora
+
+44
+2
+CH2M Hill Singapore Pte Ltd
+
+43
+2
+City Beach Resort
+
+33
+2
+Club 5
+
+38
+2
+Long Beach IMM
+
+34
+2
+Myra's Beach Club
+
+39
+2
+PARKROYAL Serviced Suites Singapore
+01-345/346
+38
+2
+PARKROYAL on Beach Road
+
+38
+2
+Pan Pacific Serviced Suites Beach Road
+
+40
+2
+Premier Inn Singapore Beach Road
+
+36
+2
+Rabobank
+31-11
+29
+2
+Shangri-La's Rasa Sentosa
+
+30
+2
+South Beach Residences - Sales
+
+32
+2
+South Beach Tower
+
+29
+2
+The South Beach
+
+32
+2
+Town Clinic
+
+42
+1
+Days Hotel Singapore at Zhongshan Park
+
+11
+1
+Goodwood Park Hotel
+
+9
+1
+Mega Adventure - Singapore
+
+17
+1
+Night Safari
+
+10
+1
+Park Avenue Clemenceau Suites
+
+16
+1
+Park Regis
+
+7
+1
+Pororo Park
+02-29
+4
+1
+Ramada Singapore at Zhongshan Park
+
+12
+1
+River Safari Singapore
+
+10
+1
+Singapore Science Park 2 - Office Rental
+
+8
+1
+Universal Studios Singapore
+
+2
+1
+Valley Park - Sales & Rent
+
+18
+1
+War Memorial Park
+
+14
+1
+Wilson Parking Singapore
+
+15
+1
+Zoom Park
+01-14
+5
+16
+The Cathay
+
+56
+7
+Bishan Sports Hall
+
+97
+11
+Battle Bunker - Funan DigitaLife Mall
+05-42
+199
+11
+Battlestar Galactica
+
+2
+11
+Bukit Brown Cemetery
+
+25
+11
+Castlewood Group
+
+201
+11
+Kranji War Memorial
+
+198
+11
+Memories at Old Ford Factory
+
+196
+11
+Nanyang Technological University
+
+200
+11
+National Museum of Singapore
+
+206
+11
+Orchid Country Club
+
+162
+11
+Reflections at Bukit Chandu War Memorial
+
+205
+11
+Singapore Sports Hub
+
+25
+11
+SongDivision Singapore
+13-00
+202
+11
+Spice Brasserie
+
+203
+11
+The Battlebox
+
+197
+11
+The Changi Museum
+
+204
+11
+Universal Studios Singapore
+
+2
+9
+ABS Bowling Pte Ltd
+
+161
+9
+Ace Bowling Management
+
+165
+9
+Bowling & Supplies
+01-323
+164
+9
+Bowling Is Science
+
+166
+9
+Bowlmaster Pte Ltd
+
+156
+9
+S.K. Bowling Supplies
+
+163
+9
+Singapore Bowling Federation
+
+25
+9
+Singapore Tenpin Bowling Congress
+
+159
+9
+SuperBowl Holdings Limited
+
+25
+9
+Superbowl Management Pte Ltd
+
+170
+9
+Superbowl The Art Of Eating Congee Pte Ltd
+
+169
+9
+The Bowler's Shop
+
+160
+9
+W2 Bowling Pro-shop
+08-11
+156
+10
+AIBI Fitness
+
+189
+10
+Americ Marine & Sports Centre
+
+182
+10
+Bedok Tennis Centre
+
+185
+10
+Bishan Stadium
+
+177
+10
+Choa Chu Kang Swimming Complex
+
+99
+10
+Clementi Swimming Complex
+
+141
+10
+Delta ActiveSG Gym
+
+82
+10
+Kallang Water Sports Centre
+
+190
+10
+Kovan Sports Centre
+01-01
+183
+10
+OCBC Aquatic Centre
+
+48
+10
+Outstanding Badminton Singapore
+04-17
+173
+10
+SAH Sports Centre
+
+117
+10
+Sea Sports Centre
+
+30
+10
+Singapore Badminton Association
+
+171
+10
+Singapore Sports Medicine Centre
+
+181
+10
+Sports Center
+01-4801
+179
+10
+Sports Center Showroom
+01-01
+188
+10
+Tampines Swimming Complex
+
+124
+10
+Water Sports Centre
+
+180
+10
+Yishun Sports and Recreation Centre
+
+184

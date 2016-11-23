@@ -1,0 +1,14 @@
+movie
+	cinema
+sports
+	gym
+	swim
+	bowling
+	snorkel
+games
+	cybercafe
+	board games
+puzzle
+	escape room
+music
+	karaoke

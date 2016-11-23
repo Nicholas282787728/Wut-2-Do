@@ -1,0 +1,25 @@
+Document: file
+Elements: list; Elements newsHeadlines = doc.select(-API-);
+Parse (API): have to parse String. // basically makes everything swee swee
+
+File input = new File("/tmp/input.html");
+Document doc = Jsoup.parse(input, "UTF-8", "http://example.com/"); // extract from file
+
+String html = "<div><p>Lorem ipsum.</p>";
+Document doc = Jsoup.parseBodyFragment(html);
+Element body = doc.body(); // extract from body
+
+File input = new File("/tmp/input.html");
+Document doc = Jsoup.parse(input, "UTF-8", "http://example.com/");
+
+Element content = doc.getElementById("content");
+Elements links = content.getElementsByTag("a");
+for (Element link : links) {
+  String linkHref = link.attr("href");
+  String linkText = link.text();
+}
+
+.. = page_clip_content.select(".product-grid.margin-left-5");
+.. = page_clip_content.select(".product-grid, .margin-left-5");
+
+div#content > p
