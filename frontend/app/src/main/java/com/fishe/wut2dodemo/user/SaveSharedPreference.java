@@ -1,4 +1,4 @@
-package com.fishe.wut2dodemo;
+package com.fishe.wut2dodemo.user;
 
 import android.content.Context;
 import android.content.SharedPreferences;

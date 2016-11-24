@@ -1,4 +1,4 @@
-package com.fishe.wut2dodemo;
+package com.fishe.wut2dodemo.user;
 
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -11,6 +11,8 @@ import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import com.fishe.wut2dodemo.R;
 
 import java.io.BufferedReader;
 import java.io.IOException;

@@ -1,13 +1,13 @@
 package com.fishe.wut2dodemo;
 
-import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import com.fishe.wut2dodemo.user.QuestionSharedPreference;
+import com.fishe.wut2dodemo.user.SaveSharedPreference;
 
 public class Setting extends AppCompatActivity {
 
@@ -55,8 +55,8 @@ public class Setting extends AppCompatActivity {
         Favourite = (TextView) findViewById(R.id.textView4);
         Frequent = (TextView) findViewById(R.id.textView5);
 
-        Username.setText("Username: "+SaveSharedPreference.getUserName(getApplicationContext()));
-        Favourite.setText("Favourite Category: "+QuestionSharedPreference.getFavourite(getApplicationContext()));
+        Username.setText("Username: "+ SaveSharedPreference.getUserName(getApplicationContext()));
+        Favourite.setText("Favourite Category: "+ QuestionSharedPreference.getFavourite(getApplicationContext()));
         Frequent.setText("Most Frequent Search: " +QuestionSharedPreference.getMostFreq(getApplicationContext()));
 
     }

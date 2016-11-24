@@ -18,7 +18,7 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+        <activity android:name=".wut2do.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -59,16 +59,16 @@
             android:name=".MapView"
             android:label="@string/title_activity_map_view" />
         <activity
-            android:name=".LoginActivity"
+            android:name=".user.LoginActivity"
             android:label="Login" />
         <activity
-            android:name=".SignupActivity"
+            android:name=".user.SignupActivity"
             android:label="Sign Up" />
         <activity
-            android:name=".QuestionUser"
+            android:name=".user.QuestionUser"
             android:label="Question 1" />
         <activity
-            android:name=".QuestionUser2"
+            android:name=".user.QuestionUser2"
             android:label="Question 2" />
         <activity
             android:name=".ReviewActivity"
@@ -77,7 +77,7 @@
             android:name=".About"
             android:label="Credits" />
         <activity
-            android:name=".QuestionUser3"
+            android:name=".user.QuestionUser3"
             android:label="Question 3"></activity>
         <activity android:name=".Tutorial"></activity>
     </application>

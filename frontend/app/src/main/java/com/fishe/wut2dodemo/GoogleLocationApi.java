@@ -14,7 +14,7 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
 /*
- * GoogleLocationApi generates the user's location by using Google LocationMethods API.
+ * GoogleLocationApi generates the user's location by using Google Location API.
  */
 public class GoogleLocationApi implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
     public static final int DEFAULT_INTERVAL = 10000;

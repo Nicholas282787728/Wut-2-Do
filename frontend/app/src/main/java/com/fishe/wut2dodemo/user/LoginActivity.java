@@ -1,4 +1,4 @@
-package com.fishe.wut2dodemo;
+package com.fishe.wut2dodemo.user;
 
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
@@ -21,7 +21,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 
-import com.facebook.FacebookSdk;
+import com.fishe.wut2dodemo.R;
 
 /**
  * A login screen that offers login via email/password.

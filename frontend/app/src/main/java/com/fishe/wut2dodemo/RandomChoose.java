@@ -3,6 +3,8 @@ package com.fishe.wut2dodemo;
 import android.content.Context;
 import android.util.Log;
 
+import com.fishe.wut2dodemo.user.QuestionSharedPreference;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -68,7 +70,7 @@ public class RandomChoose {
         this.context=context;
 
         for(int i=0;i<9;i++){
-            map.put(categoryList.get(i),QuestionSharedPreference.getPref(context,categoryList.get(i)));
+            map.put(categoryList.get(i), QuestionSharedPreference.getPref(context,categoryList.get(i)));
             Log.i("Testing ", String.valueOf(map.get(categoryList.get(i))));
         }
     }

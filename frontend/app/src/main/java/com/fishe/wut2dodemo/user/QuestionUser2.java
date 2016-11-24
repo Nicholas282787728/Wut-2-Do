@@ -1,4 +1,4 @@
-package com.fishe.wut2dodemo;
+package com.fishe.wut2dodemo.user;
 
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
@@ -8,7 +8,8 @@ import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import com.fishe.wut2dodemo.R;
 
 import java.util.ArrayList;
 

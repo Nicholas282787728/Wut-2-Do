@@ -284,8 +284,8 @@ public class ResultPage extends AppCompatActivity {
                         i.putExtras(extras);
                         startActivity(i);
 
-                        Toast.makeText(getApplicationContext(), "LocationMethods: " + temp.get(index),Toast.LENGTH_LONG).show();
-                        Log.i("LocationMethods chosen:", String.valueOf(addressList.get(index)));
+                        Toast.makeText(getApplicationContext(), "Location: " + temp.get(index),Toast.LENGTH_LONG).show();
+                        Log.i("Location chosen:", String.valueOf(addressList.get(index)));
                     }
                 });
                 return true;
@@ -310,8 +310,8 @@ public class ResultPage extends AppCompatActivity {
                         i.putExtras(extras);
                         startActivity(i);
 
-                        Toast.makeText(getApplicationContext(), "LocationMethods: " + temp.get(position),Toast.LENGTH_LONG).show();
-                        Log.i("LocationMethods chosen:", String.valueOf(addressList.get(position)));
+                        Toast.makeText(getApplicationContext(), "Location: " + temp.get(position),Toast.LENGTH_LONG).show();
+                        Log.i("Location chosen:", String.valueOf(addressList.get(position)));
                     }
                 });
 
@@ -433,8 +433,8 @@ public class ResultPage extends AppCompatActivity {
 
                         startActivity(i);
 
-                        Toast.makeText(getApplicationContext(), "LocationMethods: " + temp.get(position),Toast.LENGTH_SHORT).show();
-                        Log.i("LocationMethods chosen:", String.valueOf(addressList.get(position)));
+                        Toast.makeText(getApplicationContext(), "Location: " + temp.get(position),Toast.LENGTH_SHORT).show();
+                        Log.i("Location chosen:", String.valueOf(addressList.get(position)));
                     }
                 });
 
