@@ -3,6 +3,7 @@ package com.fishe.wut2dodemo;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -13,7 +14,7 @@ import android.widget.Toast;
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
 import uk.co.deanwild.materialshowcaseview.ShowcaseConfig;
 
-public class MainActivity extends Location {
+public class MainActivity extends AppCompatActivity {
 
     private ImageButton search, genre, random, login;
     final String PREF_NAME = "MyPrefs";
@@ -87,8 +88,6 @@ public class MainActivity extends Location {
         Intent i = new Intent(getApplicationContext(), ResultPage.class);
         Bundle extras = new Bundle();
         extras.putString("code", "random");
-        extras.putDouble("lat", googleLocationApi.getUserCoordinates().getLatitude());
-        extras.putDouble("lng", googleLocationApi.getUserCoordinates().getLongitude());
         i.putExtras(extras);
 
         startActivity(i);
@@ -123,7 +122,7 @@ public class MainActivity extends Location {
             settings.edit().putBoolean("first_time",false).apply();
         }
 
-        googleLocationApi = GoogleLocationApi.getInstance(this);
+        GoogleLocationApi.initialise(this);
 
         //if not logged in
         if(SaveSharedPreference.getIsLogIn(MainActivity.this).equals("true")) {
@@ -152,5 +151,20 @@ public class MainActivity extends Location {
                 "Create an account or log in", "Got it!");
 
         sequence.start();
+    }
+
+    @Override
+    protected void onPause() {
+        GoogleLocationApi.pauseLocationUpdates();
+    }
+
+    @Override
+    protected void onResume() {
+        GoogleLocationApi.resumeLocationUpdates();
+    }
+
+    @Override
+    protected void onStop() {
+        GoogleLocationApi.stopLocationUpdates();
     }
 }

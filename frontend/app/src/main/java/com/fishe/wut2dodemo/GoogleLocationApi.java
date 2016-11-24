@@ -14,7 +14,7 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
 /*
- * GoogleLocationApi generates the user's location by using Google Location API.
+ * GoogleLocationApi generates the user's location by using Google LocationMethods API.
  */
 public class GoogleLocationApi implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
     public static final int DEFAULT_INTERVAL = 10000;
@@ -23,7 +23,7 @@ public class GoogleLocationApi implements GoogleApiClient.ConnectionCallbacks, G
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
     private UserCoordinates userCoordinates;
-    private static GoogleLocationApi ourInstance = null;
+    private static GoogleLocationApi theOneInstance = null;
 
     private static Activity callbackActivity;
 
@@ -32,11 +32,17 @@ public class GoogleLocationApi implements GoogleApiClient.ConnectionCallbacks, G
      * @param activity  The activity that calls this method.
      * @return          Instance of GoogleLocationApi.
      */
-    public static GoogleLocationApi getInstance(Activity activity) {
+    public static GoogleLocationApi initialise(Activity activity) {
         callbackActivity = activity;
-        if (ourInstance == null)
-            ourInstance = new GoogleLocationApi(activity);
-        return ourInstance;
+        if (theOneInstance == null)
+            theOneInstance = new GoogleLocationApi(activity);
+        return theOneInstance;
+    }
+
+    public static GoogleLocationApi getInstance() {
+        if (theOneInstance == null && callbackActivity != null)
+            theOneInstance = new GoogleLocationApi(callbackActivity);
+        return theOneInstance;
     }
 
     private GoogleLocationApi(Activity activity) {
@@ -107,9 +113,34 @@ public class GoogleLocationApi implements GoogleApiClient.ConnectionCallbacks, G
         userCoordinates.updateCoordinates(location.getLatitude(), location.getLongitude());
     }
 
-    public boolean arePermissionsGranted() {
+    private boolean arePermissionsGranted() {
         return ContextCompat.checkSelfPermission(callbackActivity, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
                 && ContextCompat.checkSelfPermission(callbackActivity, android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    public static void pauseLocationUpdates() {
+        if (theOneInstance != null) {
+            LocationServices.FusedLocationApi.removeLocationUpdates(
+                    theOneInstance.getGoogleApiClient(), theOneInstance);
+        }
+    }
+
+    public static void resumeLocationUpdates() {
+        if (theOneInstance != null && theOneInstance.getGoogleApiClient().isConnected()) {
+            try {
+                LocationServices.FusedLocationApi.requestLocationUpdates(
+                        theOneInstance.getGoogleApiClient(),
+                        theOneInstance.getLocationRequest(), theOneInstance);
+            } catch (SecurityException se) {
+                assert false;
+            }
+        }
+    }
+
+    public static void stopLocationUpdates() {
+        if (theOneInstance != null) {
+            theOneInstance.getGoogleApiClient().disconnect();
+        }
     }
 
     public GoogleApiClient getGoogleApiClient() { return mGoogleApiClient; }

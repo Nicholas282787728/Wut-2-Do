@@ -386,8 +386,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         String[] result = latlng.split(",");
         Bundle extras = getIntent().getExtras();
-        double lat = extras.getDouble("lat");
-        double lng = extras.getDouble("lng");
+        GoogleLocationApi googleLocationApi = GoogleLocationApi.getInstance();
+        double lat = googleLocationApi.getUserCoordinates().getLatitude();
+        double lng = googleLocationApi.getUserCoordinates().getLongitude();
 
 
         LatLng userlocation = new LatLng(lat,lng);
@@ -429,6 +430,21 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         } else {
             return "";
         }
+    }
+
+    @Override
+    protected void onPause() {
+        GoogleLocationApi.pauseLocationUpdates();
+    }
+
+    @Override
+    protected void onResume() {
+        GoogleLocationApi.resumeLocationUpdates();
+    }
+
+    @Override
+    protected void onStop() {
+        GoogleLocationApi.stopLocationUpdates();
     }
 }
 /*

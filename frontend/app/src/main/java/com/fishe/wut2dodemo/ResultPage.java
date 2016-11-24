@@ -3,19 +3,12 @@ package com.fishe.wut2dodemo;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.location.Location;
 import android.os.AsyncTask;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.PopupMenu;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,12 +18,6 @@ import android.widget.ListView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationServices;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -229,7 +216,7 @@ class DetailRAdapter extends ArrayAdapter<DetailReview> {
 }
 
 
-public class ResultPage extends AppCompatActivity{
+public class ResultPage extends AppCompatActivity {
     ListView listView;
     ArrayList<Details> itemList;
     ArrayList<String> latlngList;
@@ -245,13 +232,6 @@ public class ResultPage extends AppCompatActivity{
     ArrayList<String> name;
     RandomChoose randomChoose;
 
-    // location variables
-    private GoogleApiClient mGoogleApiClient; // to access Google API
-    private Location mLastLocation; // last location of user
-    private double mLatitude; // converted to lat and long
-    private double mLongitude;
-    private LocationRequest mLocationRequest; // set the frequency of getting location request
-    private boolean mRequestingLocationUpdates = true; // to constantly receive location updates
     double lat;
     double lng;
 
@@ -274,8 +254,6 @@ public class ResultPage extends AppCompatActivity{
                 Bundle extras = new Bundle();
                 extras.putStringArrayList("latlng", latlngList);
                 extras.putStringArrayList("location", temp);
-                extras.putDouble("lat",lat);
-                extras.putDouble("lng",lng);
 
                 i.putExtras(extras);
                 startActivity(i);
@@ -306,8 +284,8 @@ public class ResultPage extends AppCompatActivity{
                         i.putExtras(extras);
                         startActivity(i);
 
-                        Toast.makeText(getApplicationContext(), "Location: " + temp.get(index),Toast.LENGTH_LONG).show();
-                        Log.i("Location chosen:", String.valueOf(addressList.get(index)));
+                        Toast.makeText(getApplicationContext(), "LocationMethods: " + temp.get(index),Toast.LENGTH_LONG).show();
+                        Log.i("LocationMethods chosen:", String.valueOf(addressList.get(index)));
                     }
                 });
                 return true;
@@ -332,8 +310,8 @@ public class ResultPage extends AppCompatActivity{
                         i.putExtras(extras);
                         startActivity(i);
 
-                        Toast.makeText(getApplicationContext(), "Location: " + temp.get(position),Toast.LENGTH_LONG).show();
-                        Log.i("Location chosen:", String.valueOf(addressList.get(position)));
+                        Toast.makeText(getApplicationContext(), "LocationMethods: " + temp.get(position),Toast.LENGTH_LONG).show();
+                        Log.i("LocationMethods chosen:", String.valueOf(addressList.get(position)));
                     }
                 });
 
@@ -449,16 +427,14 @@ public class ResultPage extends AppCompatActivity{
                         extras.putString("latlng",latlngList.get(position));
                         extras.putString("info", locationDetails.get(position));
                         extras.putString("location", temp.get(position));
-                        extras.putDouble("lat",lat);
-                        extras.putDouble("lng",lng);
 
                         i.putExtras(extras);
 //                        i.putExtra("latlng", latlngList.get(position));
 
                         startActivity(i);
 
-                        Toast.makeText(getApplicationContext(), "Location: " + temp.get(position),Toast.LENGTH_SHORT).show();
-                        Log.i("Location chosen:", String.valueOf(addressList.get(position)));
+                        Toast.makeText(getApplicationContext(), "LocationMethods: " + temp.get(position),Toast.LENGTH_SHORT).show();
+                        Log.i("LocationMethods chosen:", String.valueOf(addressList.get(position)));
                     }
                 });
 
@@ -492,8 +468,9 @@ public class ResultPage extends AppCompatActivity{
                 Bundle extras = getIntent().getExtras();
                 String code = extras.getString("code");
 
-                lat = extras.getDouble("lat");
-                lng = extras.getDouble("lng");
+                GoogleLocationApi googleLocationApi = GoogleLocationApi.getInstance();
+                lat = googleLocationApi.getUserCoordinates().getLatitude();
+                lng = googleLocationApi.getUserCoordinates().getLongitude();
 
                 Log.i("Code", code);
                 if(code.equals("category")) {
@@ -595,4 +572,18 @@ public class ResultPage extends AppCompatActivity{
         return sb.toString().trim();
     }
 
+    @Override
+    protected void onPause() {
+        GoogleLocationApi.pauseLocationUpdates();
+    }
+
+    @Override
+    protected void onResume() {
+        GoogleLocationApi.resumeLocationUpdates();
+    }
+
+    @Override
+    protected void onStop() {
+        GoogleLocationApi.stopLocationUpdates();
+    }
 }

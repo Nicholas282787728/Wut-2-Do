@@ -41,8 +41,9 @@ public class MapView extends FragmentActivity implements OnMapReadyCallback {
         latlngList = i.getStringArrayListExtra("latlng");
         itemList = i.getStringArrayListExtra("location");
         Bundle extras = getIntent().getExtras();
-        double lat = extras.getDouble("lat");
-        double lng = extras.getDouble("lng");
+        GoogleLocationApi googleLocationApi = GoogleLocationApi.getInstance();
+        double lat = googleLocationApi.getUserCoordinates().getLatitude();
+        double lng = googleLocationApi.getUserCoordinates().getLongitude();
         LatLng userlocation = new LatLng(lat,lng);
         mMap.addMarker(new MarkerOptions().position(userlocation).
                 title("User location").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
@@ -65,8 +66,19 @@ public class MapView extends FragmentActivity implements OnMapReadyCallback {
 
 
     }
+    @Override
+    protected void onPause() {
+        GoogleLocationApi.pauseLocationUpdates();
+    }
 
+    @Override
+    protected void onResume() {
+        GoogleLocationApi.resumeLocationUpdates();
+    }
 
-
+    @Override
+    protected void onStop() {
+        GoogleLocationApi.stopLocationUpdates();
+    }
 }
 
