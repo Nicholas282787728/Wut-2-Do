@@ -1,9 +1,12 @@
 package com.fishe.wut2dodemo;
 
+/**
+ * UserCoordinates stores the latitude and longitude of the user. Singleton pattern applied.
+ */
 public class UserCoordinates {
     private Double mLatitude;
     private Double mLongitude;
-    private static UserCoordinates ourInstance = null;
+    private static UserCoordinates theUserCoordinates = null;
 
     private UserCoordinates(double latitude, double longitude) {
         mLatitude = latitude;
@@ -11,10 +14,10 @@ public class UserCoordinates {
     }
 
     public static UserCoordinates getInstance(double latitude, double longitude) {
-        if (ourInstance == null) {
-            ourInstance = new UserCoordinates(latitude, longitude);
+        if (theUserCoordinates == null) {
+            theUserCoordinates = new UserCoordinates(latitude, longitude);
         }
-        return ourInstance;
+        return theUserCoordinates;
     }
 
     public void updateCoordinates(double latitude, double longitude) {
