@@ -1,8 +1,9 @@
 package com.fishe.wut2dodemo;
 
 import android.content.Intent;
-import android.support.v4.app.FragmentActivity;
+import android.location.Location;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -14,12 +15,20 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
 
-public class MapView extends FragmentActivity implements OnMapReadyCallback {
+public class MapView extends AppCompatActivity implements OnMapReadyCallback, LocationGenerator.LocationUpdate {
 
     private GoogleMap mMap;
     ArrayList<String> itemList;
     ArrayList<String> latlngList;
-    String address;
+    private LocationGenerator locationGenerator;
+    private LatLng userCoordinates;
+
+    @Override
+    public void updateLocation(Location location) {
+        double latitude = location.getLatitude();
+        double longitude = location.getLongitude();
+        userCoordinates = new LatLng(latitude, longitude);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,15 +50,12 @@ public class MapView extends FragmentActivity implements OnMapReadyCallback {
         latlngList = i.getStringArrayListExtra("latlng");
         itemList = i.getStringArrayListExtra("location");
         Bundle extras = getIntent().getExtras();
-        GoogleLocationApi googleLocationApi = GoogleLocationApi.getInstance();
-        double lat = googleLocationApi.getUserCoordinates().getLatitude();
-        double lng = googleLocationApi.getUserCoordinates().getLongitude();
-        LatLng userlocation = new LatLng(lat,lng);
-        mMap.addMarker(new MarkerOptions().position(userlocation).
+        locationGenerator = new LocationGenerator(this, this);
+        mMap.addMarker(new MarkerOptions().position(userCoordinates).
                 title("User location").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
 
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(userlocation));
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(userlocation,16));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(userCoordinates));
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(userCoordinates, 16));
 
 
         for(int j=0; j<latlngList.size();j++){
@@ -66,19 +72,26 @@ public class MapView extends FragmentActivity implements OnMapReadyCallback {
 
 
     }
-    @Override
-    protected void onPause() {
-        GoogleLocationApi.pauseLocationUpdates();
-    }
 
     @Override
     protected void onResume() {
-        GoogleLocationApi.resumeLocationUpdates();
+        if (locationGenerator != null) {
+            locationGenerator.resumeLocationUpdates();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        if (locationGenerator != null) {
+            locationGenerator.pauseLocationUpdates();
+        }
     }
 
     @Override
     protected void onStop() {
-        GoogleLocationApi.stopLocationUpdates();
+        if (locationGenerator != null) {
+            locationGenerator.stopLocationUpdates();
+        }
     }
 }
 

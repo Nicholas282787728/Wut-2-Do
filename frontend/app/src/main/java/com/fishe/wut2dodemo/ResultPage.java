@@ -3,6 +3,7 @@ package com.fishe.wut2dodemo;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -18,6 +19,8 @@ import android.widget.ListView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -216,7 +219,7 @@ class DetailRAdapter extends ArrayAdapter<DetailReview> {
 }
 
 
-public class ResultPage extends AppCompatActivity {
+public class ResultPage extends AppCompatActivity implements LocationGenerator.LocationUpdate {
     ListView listView;
     ArrayList<Details> itemList;
     ArrayList<String> latlngList;
@@ -231,9 +234,15 @@ public class ResultPage extends AppCompatActivity {
     HashMap<String,Integer> map;
     ArrayList<String> name;
     RandomChoose randomChoose;
+    private LocationGenerator locationGenerator;
+    private LatLng userCoordinates;
 
-    double lat;
-    double lng;
+    @Override
+    public void updateLocation(Location location) {
+        double latitude = location.getLatitude();
+        double longitude = location.getLongitude();
+        userCoordinates = new LatLng(latitude, longitude);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -448,6 +457,8 @@ public class ResultPage extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        locationGenerator = new LocationGenerator(this, this);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_result_page);
 
@@ -456,6 +467,7 @@ public class ResultPage extends AppCompatActivity {
         dialog.setCancelable(false);
         dialog.setInverseBackgroundForced(false);
         dialog.show();
+
 
         Runnable runnable = new Runnable() {
             @Override
@@ -468,9 +480,6 @@ public class ResultPage extends AppCompatActivity {
                 Bundle extras = getIntent().getExtras();
                 String code = extras.getString("code");
 
-                GoogleLocationApi googleLocationApi = GoogleLocationApi.getInstance();
-                lat = googleLocationApi.getUserCoordinates().getLatitude();
-                lng = googleLocationApi.getUserCoordinates().getLongitude();
 
                 Log.i("Code", code);
                 if(code.equals("category")) {
@@ -480,7 +489,7 @@ public class ResultPage extends AppCompatActivity {
                     category = category.replace(" ","+");
 
                     String url = "http://orbital_wut_2_do.net16.net/copy/output/show_details.php?category=" + category
-                            +"&latlong="+lat+","+lng;
+                            +"&latlong="+userCoordinates.latitude+"," + userCoordinates.longitude;
 
                     Log.i("URL category", url);
 
@@ -510,7 +519,7 @@ public class ResultPage extends AppCompatActivity {
                     searchResult = extras.getString("name").toLowerCase();
                     searchResult = searchResult.replace(" ","+");
                     String url = "http://orbital_wut_2_do.net16.net/copy/output/show_search.php?search=" + searchResult
-                            +"&latlong="+lat+","+lng;
+                            +"&latlong="+userCoordinates.latitude+","+userCoordinates.longitude;
                     Log.i("URL search", url);
 
                     DownloadTask task = new DownloadTask();
@@ -535,7 +544,7 @@ public class ResultPage extends AppCompatActivity {
                     category = category.toLowerCase();
                     category = category.replace(" ","+");
                     String url = "http://orbital_wut_2_do.net16.net/copy/output/show_details.php?category=" + category
-                            +"&latlong="+lat+","+lng;
+                            +"&latlong="+userCoordinates.latitude+","+userCoordinates.longitude;
                     Log.i("URL search", url);
 
                     DownloadTask task = new DownloadTask();
@@ -573,17 +582,23 @@ public class ResultPage extends AppCompatActivity {
     }
 
     @Override
-    protected void onPause() {
-        GoogleLocationApi.pauseLocationUpdates();
+    protected void onResume() {
+        if (locationGenerator != null) {
+            locationGenerator.resumeLocationUpdates();
+        }
     }
 
     @Override
-    protected void onResume() {
-        GoogleLocationApi.resumeLocationUpdates();
+    protected void onPause() {
+        if (locationGenerator != null) {
+            locationGenerator.pauseLocationUpdates();
+        }
     }
 
     @Override
     protected void onStop() {
-        GoogleLocationApi.stopLocationUpdates();
+        if (locationGenerator != null) {
+            locationGenerator.stopLocationUpdates();
+        }
     }
 }

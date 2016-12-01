@@ -13,7 +13,6 @@ import android.widget.Toast;
 
 import com.fishe.wut2dodemo.About;
 import com.fishe.wut2dodemo.Genre;
-import com.fishe.wut2dodemo.GoogleLocationApi;
 import com.fishe.wut2dodemo.R;
 import com.fishe.wut2dodemo.ResultPage;
 import com.fishe.wut2dodemo.Search;
@@ -133,8 +132,6 @@ public class MainActivity extends AppCompatActivity {
             settings.edit().putBoolean("first_time",false).apply();
         }
 
-        GoogleLocationApi.initialise(this);
-
         //if not logged in
         if(SaveSharedPreference.getIsLogIn(MainActivity.this).equals("true")) {
             Toast.makeText(getApplicationContext(), "Welcome Back " + SaveSharedPreference.getUserName(MainActivity.this),Toast.LENGTH_SHORT).show();
@@ -162,20 +159,5 @@ public class MainActivity extends AppCompatActivity {
                 "Create an account or log in", "Got it!");
 
         sequence.start();
-    }
-
-    @Override
-    protected void onPause() {
-        GoogleLocationApi.pauseLocationUpdates();
-    }
-
-    @Override
-    protected void onResume() {
-        GoogleLocationApi.resumeLocationUpdates();
-    }
-
-    @Override
-    protected void onStop() {
-        GoogleLocationApi.stopLocationUpdates();
     }
 }

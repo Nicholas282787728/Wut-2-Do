@@ -2,6 +2,7 @@ package com.fishe.wut2dodemo;
 
 import android.content.Context;
 import android.content.Intent;
+import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -45,11 +46,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 class DetailMapReview implements Comparable<DetailReview> {
-    String name;
-    String date;
-    String review;
-    double avg_review;
-    String text;
+    private String name;
+    private String date;
+    private String review;
+    private double avg_review;
+    private String text;
 
     public DetailMapReview(JSONObject object){
         /*
@@ -83,15 +84,6 @@ class DetailMapReview implements Comparable<DetailReview> {
     public String getText() {
         return text;
     }
-
-    public String getReview() {
-        if(review.equals("0")){
-            return "-";
-        }else{
-            return review;
-        }
-    }
-
     public float getAvg(){ return (float) avg_review;}
 
     public int compareTo(DetailReview other) {
@@ -159,11 +151,12 @@ class DetailMapAdapter extends ArrayAdapter<DetailMapReview> {
     }
 }
 
-public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, LocationGenerator.LocationUpdate {
 
     ListView listView, listView2;
+    private LocationGenerator locationGenerator;
     private GoogleMap mMap;
-    double lat=0,lng=0;
+    private LatLng userCoordinates;
     String address;
     String postal;
     String latlng;
@@ -175,6 +168,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     ArrayList<String> reviewList;
     ArrayList<DetailMapReview> itemList;
     String[] addressResult;
+
+    @Override
+    public void updateLocation(Location location) {
+        double latitude = location.getLatitude();
+        double longitude = location.getLongitude();
+        userCoordinates = new LatLng(latitude, longitude);
+    }
+
     public class DownloadTask extends AsyncTask<String,Void,String> {
 
         @Override
@@ -257,6 +258,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+        locationGenerator = new LocationGenerator(this, this);
 
     }
     @Override
@@ -383,13 +385,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         String[] result = latlng.split(",");
         Bundle extras = getIntent().getExtras();
-        GoogleLocationApi googleLocationApi = GoogleLocationApi.getInstance();
-        double lat = googleLocationApi.getUserCoordinates().getLatitude();
-        double lng = googleLocationApi.getUserCoordinates().getLongitude();
 
-
-        LatLng userlocation = new LatLng(lat,lng);
-        mMap.addMarker(new MarkerOptions().position(userlocation).
+        mMap.addMarker(new MarkerOptions().position(userCoordinates).
                 title("User location").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
 
         LatLng placeOfInterest = new LatLng(Double.parseDouble(result[0]),Double.parseDouble(result[1]));
@@ -430,18 +427,24 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     @Override
-    protected void onPause() {
-        GoogleLocationApi.pauseLocationUpdates();
+    protected void onResume() {
+        if (locationGenerator != null) {
+            locationGenerator.resumeLocationUpdates();
+        }
     }
 
     @Override
-    protected void onResume() {
-        GoogleLocationApi.resumeLocationUpdates();
+    protected void onPause() {
+        if (locationGenerator != null) {
+            locationGenerator.pauseLocationUpdates();
+        }
     }
 
     @Override
     protected void onStop() {
-        GoogleLocationApi.stopLocationUpdates();
+        if (locationGenerator != null) {
+            locationGenerator.stopLocationUpdates();
+        }
     }
 }
 /*
