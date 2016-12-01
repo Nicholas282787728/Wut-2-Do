@@ -13,38 +13,36 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
-/*
+/**
  * GoogleLocationApi generates the user's location by using Google Location API.
+ * Singleton pattern applied.
  */
-public class GoogleLocationApi implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
+public class GoogleLocationApi implements GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener, LocationListener {
+
     public static final int DEFAULT_INTERVAL = 10000;
     public static final int DEFAULT_FASTEST_INTERVAL = 5000;
 
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
     private UserCoordinates userCoordinates;
-    private static GoogleLocationApi theOneInstance = null;
+    private static GoogleLocationApi theGoogleLocationApi = null;
 
-    private static Activity callbackActivity;
-
-    /*
-     * Singleton
+    /**
+     *
      * @param activity  The activity that calls this method.
      * @return          Instance of GoogleLocationApi.
      */
-    public static GoogleLocationApi initialise(Activity activity) {
-        callbackActivity = activity;
-        if (theOneInstance == null)
-            theOneInstance = new GoogleLocationApi(activity);
-        return theOneInstance;
-    }
-
     public static GoogleLocationApi getInstance() {
-        if (theOneInstance == null && callbackActivity != null)
-            theOneInstance = new GoogleLocationApi(callbackActivity);
-        return theOneInstance;
+        if (theGoogleLocationApi == null)
+            theGoogleLocationApi = new GoogleLocationApi();
+        return theGoogleLocationApi;
     }
 
+    /**
+     *
+     * @param activity  The activity that calls this method.
+     */
     private GoogleLocationApi(Activity activity) {
         mGoogleApiClient = new GoogleApiClient.Builder(activity)
                 .addConnectionCallbacks(this)
@@ -56,8 +54,8 @@ public class GoogleLocationApi implements GoogleApiClient.ConnectionCallbacks, G
     }
 
     @Override
-    public void onConnectionSuspended(int cause) {
-        Log.i("Connection lost?", "Oh no");
+    public void onConnectionSuspended(int cause) throws Exception {
+        //throw
     }
 
     @Override
@@ -65,8 +63,9 @@ public class GoogleLocationApi implements GoogleApiClient.ConnectionCallbacks, G
         Log.i("Connection failed?", "Oh no");
     }
 
-    /*
-     * Sets the accuracy and interval of results to default values
+    /**
+     * Sets the accuracy of generating user location and the interval of updating
+     * the location of user location to default values.
      */
     private void createLocationRequest() {
         if (mLocationRequest == null) {
@@ -77,7 +76,7 @@ public class GoogleLocationApi implements GoogleApiClient.ConnectionCallbacks, G
         }
     }
 
-    /*
+    /**
      * Requests locations and internet permissions from user, and generates user location.
      */
     @Override
@@ -105,7 +104,7 @@ public class GoogleLocationApi implements GoogleApiClient.ConnectionCallbacks, G
         }
     }
 
-    /*
+    /**
      * Updates user's location when the user moves around.
      */
     @Override
@@ -119,18 +118,18 @@ public class GoogleLocationApi implements GoogleApiClient.ConnectionCallbacks, G
     }
 
     public static void pauseLocationUpdates() {
-        if (theOneInstance != null) {
+        if (theGoogleLocationApi != null) {
             LocationServices.FusedLocationApi.removeLocationUpdates(
-                    theOneInstance.getGoogleApiClient(), theOneInstance);
+                    theGoogleLocationApi.getGoogleApiClient(), theGoogleLocationApi);
         }
     }
 
     public static void resumeLocationUpdates() {
-        if (theOneInstance != null && theOneInstance.getGoogleApiClient().isConnected()) {
+        if (theGoogleLocationApi != null && theGoogleLocationApi.getGoogleApiClient().isConnected()) {
             try {
                 LocationServices.FusedLocationApi.requestLocationUpdates(
-                        theOneInstance.getGoogleApiClient(),
-                        theOneInstance.getLocationRequest(), theOneInstance);
+                        theGoogleLocationApi.getGoogleApiClient(),
+                        theGoogleLocationApi.getLocationRequest(), theGoogleLocationApi);
             } catch (SecurityException se) {
                 assert false;
             }
@@ -138,8 +137,8 @@ public class GoogleLocationApi implements GoogleApiClient.ConnectionCallbacks, G
     }
 
     public static void stopLocationUpdates() {
-        if (theOneInstance != null) {
-            theOneInstance.getGoogleApiClient().disconnect();
+        if (theGoogleLocationApi != null) {
+            theGoogleLocationApi.getGoogleApiClient().disconnect();
         }
     }
 
