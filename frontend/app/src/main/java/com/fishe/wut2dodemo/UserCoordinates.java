@@ -22,14 +22,6 @@ public class UserCoordinates {
         mLongitude = longitude;
     }
 
-    public void setLatitude(double latitude) {
-        mLatitude = latitude;
-    }
-
-    public void setLongitude(double longitude) {
-        mLongitude = longitude;
-    }
-
     public double getLatitude() {
         return mLatitude;
     }
