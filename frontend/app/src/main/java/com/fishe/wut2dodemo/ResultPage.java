@@ -490,8 +490,8 @@ public class ResultPage extends RuntimePermissionsActivity implements LocationGe
 
                 Object mPauseLock = new Object();
                 synchronized (mPauseLock) {
-                    while (locationGenerator.getGoogleApiClient().isConnecting() &&
-                            !locationGenerator.getGoogleApiClient().isConnected()) {
+                    while (locationGenerator.getGoogleApiClient().isConnecting()
+                            && !locationGenerator.getGoogleApiClient().isConnected()) {
                         try {
                             Log.i(TAG, "Waiting for GoogleApiClient to connect.");
                             mPauseLock.wait();

@@ -15,10 +15,6 @@ import android.view.View;
 import android.support.design.widget.Snackbar;
 
 public abstract class RuntimePermissionsActivity extends AppCompatActivity {
-    public static final String INTERNET_PERMISSION = android.Manifest.permission.INTERNET;
-    private final String FINE_LOCATION_PERMISSION = "android.Manifest.permission.ACCESS_FINE_LOCATION";
-    private final String COARSE_LOCATION_PERMISSION = "android.Manifest.permission.ACCESS_COARSE_LOCATION";
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,18 +45,17 @@ public abstract class RuntimePermissionsActivity extends AppCompatActivity {
     }
 
     protected boolean arePermissionsGranted() {
-        return ContextCompat.checkSelfPermission(this, FINE_LOCATION_PERMISSION) == PackageManager.PERMISSION_GRANTED
-                && ContextCompat.checkSelfPermission(this, COARSE_LOCATION_PERMISSION) == PackageManager.PERMISSION_GRANTED;
+        return ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED;
     }
 
     protected void requestAppPermissions(final int requestCode) {
-        boolean shouldShowRequestPermissionRationale = true;
-
         if (arePermissionsGranted()) {
             Log.i("RuntimePermissions", "Permissions are granted.");
             onPermissionsGranted(requestCode);
         } else {
-            if (shouldShowRequestPermissionRationale) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    android.Manifest.permission.ACCESS_FINE_LOCATION)) {
                 Log.i("RuntimePermissions", "Showing request permission rationale.");
                 Snackbar.make(findViewById(android.R.id.content), "Please give permissions.",
                         Snackbar.LENGTH_LONG).setAction("GRANT",
@@ -68,17 +63,16 @@ public abstract class RuntimePermissionsActivity extends AppCompatActivity {
                             @Override
                             public void onClick(View v) {
                                 ActivityCompat.requestPermissions(RuntimePermissionsActivity.this,
-                                        new String[]{FINE_LOCATION_PERMISSION,
-                                        COARSE_LOCATION_PERMISSION, INTERNET_PERMISSION}, requestCode);
+                                        new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, requestCode);
                             }
                         }).show();
             } else {
                 Log.i("RuntimePermissions", "No need to request permission rationale.");
-                ActivityCompat.requestPermissions(this, new String[]{FINE_LOCATION_PERMISSION,
-                        COARSE_LOCATION_PERMISSION, INTERNET_PERMISSION}, 10);
+                ActivityCompat.requestPermissions(this, new String[]{
+                        android.Manifest.permission.ACCESS_FINE_LOCATION}, 10);
             }
         }
     }
 
-    public abstract void onPermissionsGranted(int requestCode);
+    public abstract void onPermissionsGranted(final int requestCode);
 }
