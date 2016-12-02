@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import com.fishe.wut2dodemo.About;
 import com.fishe.wut2dodemo.Genre;
+import com.fishe.wut2dodemo.LocationGenerator;
 import com.fishe.wut2dodemo.R;
 import com.fishe.wut2dodemo.ResultPage;
 import com.fishe.wut2dodemo.Search;

@@ -32,7 +32,7 @@ public class LocationGenerator implements
     private LocationRequest mLocationRequest;
     private LocationUpdate mLocationUpdate;
     private Context mContext;
-    private boolean isFunctioning = false;
+    private boolean isGeneratingLocation = false;
 
     public interface LocationUpdate {
         void updateLocation(Location location);
@@ -73,7 +73,7 @@ public class LocationGenerator implements
     @Override
     public void onConnectionSuspended(int cause) {
         Log.i("TAG", "GoogleApiClient connection suspended with code: " + cause);
-        isFunctioning = false;
+        isGeneratingLocation = false;
     }
 
     @Override
@@ -105,23 +105,12 @@ public class LocationGenerator implements
 
             LocationServices.FusedLocationApi.requestLocationUpdates(
                     mGoogleApiClient, mLocationRequest, this);
-            isFunctioning = true;
+            isGeneratingLocation = true;
         } catch (SecurityException se) {
             Log.i(TAG, "Security Exception caught.");
-            isFunctioning = false;
+            isGeneratingLocation = false;
         }
     }
-
-    private boolean arePermissionsGranted() {
-        // TODO: Request permissions. Actually no permission also ok, the app works fine without it
-        return ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
-                && ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
-
-            activity.requestPermissions(new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION, android.Manifest.permission.ACCESS_FINE_LOCATION,
-                    android.Manifest.permission.INTERNET}, 10);
-    }/*
-    Log.i("lat: ", String.valueOf(mLastLocation.getLatitude()));
-    Log.i("lng: ", String.valueOf(mLastLocation.getLongitude()));*/
 
     /**
      * Updates user's location when the user moves around.
@@ -142,7 +131,7 @@ public class LocationGenerator implements
                     mGoogleApiClient, mLocationRequest, this);
         } catch (SecurityException se) {
             Log.i(TAG, "Security Exception caught.");
-            isFunctioning = false;
+            isGeneratingLocation = false;
         }
     }
 
@@ -156,7 +145,7 @@ public class LocationGenerator implements
         mGoogleApiClient.disconnect();
     }
 
-    public boolean getFunctioning() {
-        return isFunctioning;
+    public boolean isGeneratingLocation() {
+        return isGeneratingLocation;
     }
 }

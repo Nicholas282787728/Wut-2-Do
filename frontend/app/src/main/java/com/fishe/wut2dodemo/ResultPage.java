@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -219,7 +220,7 @@ class DetailRAdapter extends ArrayAdapter<DetailReview> {
 }
 
 
-public class ResultPage extends AppCompatActivity implements LocationGenerator.LocationUpdate {
+public class ResultPage extends RuntimePermissionsActivity implements LocationGenerator.LocationUpdate {
     ListView listView;
     ArrayList<Details> itemList;
     ArrayList<String> latlngList;
@@ -236,6 +237,11 @@ public class ResultPage extends AppCompatActivity implements LocationGenerator.L
     RandomChoose randomChoose;
     private LocationGenerator locationGenerator;
     private LatLng userCoordinates;
+
+    @Override
+    public void onPermissionsGranted(int requestCode) {
+        Snackbar.make(findViewById(android.R.id.content), "Permissions Received.", Snackbar.LENGTH_SHORT).show();
+    }
 
     @Override
     public void updateLocation(Location location) {

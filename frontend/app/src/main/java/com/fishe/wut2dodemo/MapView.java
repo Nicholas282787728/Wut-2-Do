@@ -3,6 +3,7 @@ package com.fishe.wut2dodemo;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -15,7 +16,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
 
-public class MapView extends AppCompatActivity implements OnMapReadyCallback, LocationGenerator.LocationUpdate {
+public class MapView extends RuntimePermissionsActivity implements OnMapReadyCallback, LocationGenerator.LocationUpdate {
 
     private GoogleMap mMap;
     ArrayList<String> itemList;
@@ -38,6 +39,11 @@ public class MapView extends AppCompatActivity implements OnMapReadyCallback, Lo
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+    }
+
+    @Override
+    public void onPermissionsGranted(int requestCode) {
+        Snackbar.make(findViewById(android.R.id.content), "Permissions Received.", Snackbar.LENGTH_SHORT).show();
     }
 
 

@@ -6,6 +6,7 @@ import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -151,7 +152,7 @@ class DetailMapAdapter extends ArrayAdapter<DetailMapReview> {
     }
 }
 
-public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, LocationGenerator.LocationUpdate {
+public class MapsActivity extends RuntimePermissionsActivity implements OnMapReadyCallback, LocationGenerator.LocationUpdate {
 
     ListView listView, listView2;
     private LocationGenerator locationGenerator;
@@ -168,6 +169,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     ArrayList<String> reviewList;
     ArrayList<DetailMapReview> itemList;
     String[] addressResult;
+
+    @Override
+    public void onPermissionsGranted(int requestCode) {
+        Snackbar.make(findViewById(android.R.id.content), "Permissions Received.", Snackbar.LENGTH_SHORT).show();
+    }
 
     @Override
     public void updateLocation(Location location) {
