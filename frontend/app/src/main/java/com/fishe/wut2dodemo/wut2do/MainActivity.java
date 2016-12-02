@@ -3,7 +3,7 @@ package com.fishe.wut2dodemo.wut2do;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -13,7 +13,6 @@ import android.widget.Toast;
 
 import com.fishe.wut2dodemo.About;
 import com.fishe.wut2dodemo.Genre;
-import com.fishe.wut2dodemo.LocationGenerator;
 import com.fishe.wut2dodemo.R;
 import com.fishe.wut2dodemo.ResultPage;
 import com.fishe.wut2dodemo.RuntimePermissionsActivity;
@@ -28,6 +27,7 @@ import uk.co.deanwild.materialshowcaseview.ShowcaseConfig;
 
 public class MainActivity extends RuntimePermissionsActivity {
 
+    public static final String TAG = MainActivity.class.getSimpleName();
     private ImageButton search, genre, random, login;
     final String PREF_NAME = "MyPrefs";
 
@@ -116,7 +116,7 @@ public class MainActivity extends RuntimePermissionsActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (!arePermissionsGranted()) {
+        if (!isPermissionGranted()) {
             Log.i("MainActivity", "Requesting for permissions.");
             requestAppPermissions(9998);
         }
@@ -150,7 +150,9 @@ public class MainActivity extends RuntimePermissionsActivity {
 
     @Override
     public void onPermissionsGranted(int requestCode) {
-
+        Log.i(TAG, "Permissions granted with request code: " + requestCode);
+        Snackbar.make(findViewById(android.R.id.content), "Yay you can now enjoy the full " +
+                "functionalities of our application. ˆˆ", Snackbar.LENGTH_LONG).show();
     }
 
     private void doTutorial(){

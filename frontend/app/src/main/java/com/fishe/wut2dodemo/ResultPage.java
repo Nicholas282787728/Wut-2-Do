@@ -7,7 +7,6 @@ import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -469,7 +468,7 @@ public class ResultPage extends RuntimePermissionsActivity implements LocationGe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         locationGenerator = new LocationGenerator(this, this);
-        if (!arePermissionsGranted()) {
+        if (!isPermissionGranted()) {
             Log.i(TAG, "Requesting for permissions.");
             requestAppPermissions(9998);
         }
@@ -495,12 +494,13 @@ public class ResultPage extends RuntimePermissionsActivity implements LocationGe
                         try {
                             Log.i(TAG, "Waiting for GoogleApiClient to connect.");
                             mPauseLock.wait();
+                            mPauseLock.notifyAll();
                         } catch (InterruptedException ie) {
                             Log.i(TAG, "InterruptedException caught.");
                         }
                     }
+                    Log.i(TAG, "After pausing for GoogleApiClient to connect.");
                 }
-
                 nameRe = (TextView)findViewById(R.id.resultPg);
                 String searchQuery = "";
                 category = "";
@@ -567,9 +567,6 @@ public class ResultPage extends RuntimePermissionsActivity implements LocationGe
                 }
                 //random result here
                 else {
-
-                    Log.i(TAG, "After pausing for GoogleApiClient to connect.");
-
                     Log.i(TAG, "Choosing");
                     randomChoose = new RandomChoose(getApplicationContext());
                     category = randomChoose.getRandomCategory();

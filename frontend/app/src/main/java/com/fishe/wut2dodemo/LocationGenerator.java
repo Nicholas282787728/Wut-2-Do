@@ -3,10 +3,10 @@ package com.fishe.wut2dodemo;
 import android.app.Activity;
 import android.content.Context;
 import android.content.IntentSender;
-import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -32,14 +32,18 @@ public class LocationGenerator implements
     private LocationRequest mLocationRequest;
     private LocationUpdate mLocationUpdate;
     private Context mContext;
-    private boolean isGeneratingLocation = false;
 
+    /**
+     *
+     */
     public interface LocationUpdate {
         void updateLocation(Location location);
     }
 
     /**
-     * @param context  The context that calls this method.
+     * Initialises the necessary components to generate user's location.
+     * @param context           The Context that called this constructor.
+     * @param locationUpdate    The Activity implementing LocationUpdate that called this constructor.
      */
     public LocationGenerator(Context context, LocationUpdate locationUpdate) {
         Log.i(TAG, "Initialising LocationGenerator.");
@@ -47,11 +51,12 @@ public class LocationGenerator implements
         createLocationRequest();
         mLocationUpdate = locationUpdate;
         mContext = context;
-        if (mGoogleApiClient.isConnecting()) {
-            Log.i(TAG, "GoogleApiClient is connecting.");
-        }
     }
 
+    /**
+     *
+     * @param context   The Context that called this method.
+     */
     private void initialiseGoogleApiClient(Context context) {
         mGoogleApiClient = new GoogleApiClient.Builder(context)
                 .addConnectionCallbacks(this)
@@ -74,15 +79,26 @@ public class LocationGenerator implements
         }
     }
 
+    /**
+     * Automatically called when GoogleApiClient connection is suspended temporarily.
+     * It will try to automatically resolve by reconnecting GoogleApiClient if possible.
+     * @param cause Reason for disconnection.
+     */
     @Override
     public void onConnectionSuspended(int cause) {
         Log.i("TAG", "GoogleApiClient connection suspended with code: " + cause);
-        isGeneratingLocation = false;
     }
 
+    /**
+     * Automatically called when GoogleApiClient fails to connect to Google servers.
+     * It will try to automatically resolve by reconnecting GoogleApiClient if possible.
+     * @param result    A ConnectionResult that can be used for resolving the error,
+     *                  and deciding what sort of error occurred.
+     */
     @Override
-    public void onConnectionFailed(ConnectionResult result) {
+    public void onConnectionFailed(@NonNull ConnectionResult result) {
         Log.i("TAG", "GoogleApiClient failed to connect.");
+
         if (result.hasResolution() && mContext instanceof Activity) {
             try {
                 Activity activity = (Activity) mContext;
@@ -96,7 +112,8 @@ public class LocationGenerator implements
     }
 
     /**
-     * Requests locations and internet permissions from user, and generates user location.
+     * Automatically called upon GoogleApiClient successful connection.
+     * It will begin to request for location updates.
      */
     @Override
     public void onConnected(Bundle bundle) {
@@ -104,27 +121,30 @@ public class LocationGenerator implements
         try {
             Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
             if (location != null) {
-                Log.i(TAG, "Location isn't null.");
+                Log.i(TAG, "Able to detect user's previous location.");
                 mLocationUpdate.updateLocation(location);
             }
 
             LocationServices.FusedLocationApi.requestLocationUpdates(
                     mGoogleApiClient, mLocationRequest, this);
-            isGeneratingLocation = true;
         } catch (SecurityException se) {
             Log.i(TAG, "Security Exception caught: " + se.getMessage());
-            isGeneratingLocation = false;
         }
     }
 
     /**
-     * Updates user's location when the user moves around.
+     * Updates user's location when the user moves around. Automatically called when user' location
+     * changes.
+     * @param location  User's new location.
      */
     @Override
     public void onLocationChanged(Location location) {
         mLocationUpdate.updateLocation(location);
     }
 
+    /**
+     * Reconnects GoogleApiClient and request for location updates.
+     */
     public void resumeLocationUpdates() {
         if (!mGoogleApiClient.isConnected() && !mGoogleApiClient.isConnecting()) {
             mGoogleApiClient.connect();
@@ -136,7 +156,6 @@ public class LocationGenerator implements
                     mGoogleApiClient, mLocationRequest, this);
         } catch (SecurityException se) {
             Log.i(TAG, "Security Exception caught: " + se.getMessage());
-            isGeneratingLocation = false;
         }
     }
 
@@ -151,7 +170,4 @@ public class LocationGenerator implements
     }
 
     public GoogleApiClient getGoogleApiClient() { return mGoogleApiClient; }
-    public boolean isGeneratingLocation() {
-        return isGeneratingLocation;
-    }
 }
