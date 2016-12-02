@@ -39,6 +39,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import static java.lang.Thread.sleep;
+
 
 class Details{
     String name;
@@ -221,6 +223,7 @@ class DetailRAdapter extends ArrayAdapter<DetailReview> {
 
 
 public class ResultPage extends RuntimePermissionsActivity implements LocationGenerator.LocationUpdate {
+    public static final String TAG = ResultPage.class.getSimpleName();
     ListView listView;
     ArrayList<Details> itemList;
     ArrayList<String> latlngList;
@@ -245,6 +248,7 @@ public class ResultPage extends RuntimePermissionsActivity implements LocationGe
 
     @Override
     public void updateLocation(Location location) {
+        Log.i(TAG, "Location is being updated.");
         double latitude = location.getLatitude();
         double longitude = location.getLongitude();
         userCoordinates = new LatLng(latitude, longitude);
@@ -347,6 +351,7 @@ public class ResultPage extends RuntimePermissionsActivity implements LocationGe
             HttpURLConnection urlConnection = null;
 
             try {
+                Log.i(TAG, "Am I here?");
                 url = new URL(urls[0]);
                 urlConnection = (HttpURLConnection)url.openConnection();
                 InputStream in = urlConnection.getInputStream();
@@ -464,6 +469,10 @@ public class ResultPage extends RuntimePermissionsActivity implements LocationGe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         locationGenerator = new LocationGenerator(this, this);
+        if (!arePermissionsGranted()) {
+            Log.i(TAG, "Requesting for permissions.");
+            requestAppPermissions(9998);
+        }
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_result_page);
@@ -479,6 +488,19 @@ public class ResultPage extends RuntimePermissionsActivity implements LocationGe
             @Override
             public void run() {
 
+                Object mPauseLock = new Object();
+                synchronized (mPauseLock) {
+                    while (locationGenerator.getGoogleApiClient().isConnecting() &&
+                            !locationGenerator.getGoogleApiClient().isConnected()) {
+                        try {
+                            Log.i(TAG, "Waiting for GoogleApiClient to connect.");
+                            mPauseLock.wait();
+                        } catch (InterruptedException ie) {
+                            Log.i(TAG, "InterruptedException caught.");
+                        }
+                    }
+                }
+
                 nameRe = (TextView)findViewById(R.id.resultPg);
                 String searchQuery = "";
                 category = "";
@@ -493,7 +515,9 @@ public class ResultPage extends RuntimePermissionsActivity implements LocationGe
                     //ensure the string is in proper format to be passed into url
                     category = extras.getString("name").toLowerCase();
                     category = category.replace(" ","+");
-
+                    /*while (userCoordinates == null) {
+                        Log.i("i", "i");
+                    }*/
                     String url = "http://orbital_wut_2_do.net16.net/copy/output/show_details.php?category=" + category
                             +"&latlong="+userCoordinates.latitude+"," + userCoordinates.longitude;
 
@@ -543,6 +567,10 @@ public class ResultPage extends RuntimePermissionsActivity implements LocationGe
                 }
                 //random result here
                 else {
+
+                    Log.i(TAG, "After pausing for GoogleApiClient to connect.");
+
+                    Log.i(TAG, "Choosing");
                     randomChoose = new RandomChoose(getApplicationContext());
                     category = randomChoose.getRandomCategory();
                     Log.i("Random", category);
@@ -587,24 +615,29 @@ public class ResultPage extends RuntimePermissionsActivity implements LocationGe
         return sb.toString().trim();
     }
 
-    @Override
+    /*@Override
     protected void onResume() {
+        Log.i(TAG, "Resuming activity.");
         if (locationGenerator != null) {
             locationGenerator.resumeLocationUpdates();
         }
-    }
+    }*/
 
-    @Override
+/*    @Override
     protected void onPause() {
+        Log.i(TAG, "Pausing activity.");
         if (locationGenerator != null) {
             locationGenerator.pauseLocationUpdates();
         }
+        super.onPause();
     }
 
     @Override
     protected void onStop() {
+        Log.i(TAG, "Stopping activity.");
         if (locationGenerator != null) {
             locationGenerator.stopLocationUpdates();
         }
-    }
+        super.onStop();
+    }*/
 }

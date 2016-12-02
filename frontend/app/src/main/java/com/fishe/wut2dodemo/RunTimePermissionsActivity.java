@@ -9,20 +9,19 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.util.SparseIntArray;
 import android.view.View;
 import android.support.design.widget.Snackbar;
 
 public abstract class RuntimePermissionsActivity extends AppCompatActivity {
     public static final String INTERNET_PERMISSION = android.Manifest.permission.INTERNET;
-    private SparseIntArray mErrorString;
     private final String FINE_LOCATION_PERMISSION = "android.Manifest.permission.ACCESS_FINE_LOCATION";
     private final String COARSE_LOCATION_PERMISSION = "android.Manifest.permission.ACCESS_COARSE_LOCATION";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mErrorString = new SparseIntArray();
     }
 
     @Override
@@ -31,8 +30,8 @@ public abstract class RuntimePermissionsActivity extends AppCompatActivity {
         if (arePermissionsGranted()) {
             onPermissionsGranted(requestCode);
         } else {
-            Snackbar.make(findViewById(android.R.id.content), mErrorString.get(requestCode),
-                    Snackbar.LENGTH_SHORT).setAction("ENABLE",
+            Snackbar.make(findViewById(android.R.id.content), "Please give permissions.",
+                    Snackbar.LENGTH_LONG).setAction("ENABLE",
                     new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -49,29 +48,32 @@ public abstract class RuntimePermissionsActivity extends AppCompatActivity {
         }
     }
 
-    private boolean arePermissionsGranted() {
+    protected boolean arePermissionsGranted() {
         return ContextCompat.checkSelfPermission(this, FINE_LOCATION_PERMISSION) == PackageManager.PERMISSION_GRANTED
-                || ContextCompat.checkSelfPermission(this, COARSE_LOCATION_PERMISSION) == PackageManager.PERMISSION_GRANTED;
+                && ContextCompat.checkSelfPermission(this, COARSE_LOCATION_PERMISSION) == PackageManager.PERMISSION_GRANTED;
     }
 
-    public void requestAppPermissions(final String[] requestedPermissions,
-                                      final int stringId, final int requestCode) {
-        mErrorString.put(requestCode, stringId);
-        boolean shouldShowRequestPermissionRationale = false;
+    protected void requestAppPermissions(final int requestCode) {
+        boolean shouldShowRequestPermissionRationale = true;
 
         if (arePermissionsGranted()) {
+            Log.i("RuntimePermissions", "Permissions are granted.");
             onPermissionsGranted(requestCode);
         } else {
             if (shouldShowRequestPermissionRationale) {
-                Snackbar.make(findViewById(android.R.id.content), stringId,
-                        Snackbar.LENGTH_SHORT).setAction("GRANT",
+                Log.i("RuntimePermissions", "Showing request permission rationale.");
+                Snackbar.make(findViewById(android.R.id.content), "Please give permissions.",
+                        Snackbar.LENGTH_LONG).setAction("GRANT",
                         new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                ActivityCompat.requestPermissions(RuntimePermissionsActivity.this, requestedPermissions, requestCode);
+                                ActivityCompat.requestPermissions(RuntimePermissionsActivity.this,
+                                        new String[]{FINE_LOCATION_PERMISSION,
+                                        COARSE_LOCATION_PERMISSION, INTERNET_PERMISSION}, requestCode);
                             }
                         }).show();
             } else {
+                Log.i("RuntimePermissions", "No need to request permission rationale.");
                 ActivityCompat.requestPermissions(this, new String[]{FINE_LOCATION_PERMISSION,
                         COARSE_LOCATION_PERMISSION, INTERNET_PERMISSION}, 10);
             }

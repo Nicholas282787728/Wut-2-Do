@@ -16,6 +16,7 @@ import com.fishe.wut2dodemo.Genre;
 import com.fishe.wut2dodemo.LocationGenerator;
 import com.fishe.wut2dodemo.R;
 import com.fishe.wut2dodemo.ResultPage;
+import com.fishe.wut2dodemo.RuntimePermissionsActivity;
 import com.fishe.wut2dodemo.Search;
 import com.fishe.wut2dodemo.Setting;
 import com.fishe.wut2dodemo.user.LoginActivity;
@@ -25,7 +26,7 @@ import com.fishe.wut2dodemo.user.SaveSharedPreference;
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
 import uk.co.deanwild.materialshowcaseview.ShowcaseConfig;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends RuntimePermissionsActivity {
 
     private ImageButton search, genre, random, login;
     final String PREF_NAME = "MyPrefs";
@@ -115,6 +116,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (!arePermissionsGranted()) {
+            Log.i("MainActivity", "Requesting for permissions.");
+            requestAppPermissions(9998);
+        }
         getSupportActionBar().setDisplayShowHomeEnabled(true);
    //     getSupportActionBar().setLogo(R.drawable.app);
    //     getSupportActionBar().setDisplayUseLogoEnabled(true);
@@ -141,6 +146,11 @@ public class MainActivity extends AppCompatActivity {
             QuestionSharedPreference.setDefault(getApplicationContext());
             Log.i("User", "Logged out");
         }
+    }
+
+    @Override
+    public void onPermissionsGranted(int requestCode) {
+
     }
 
     private void doTutorial(){

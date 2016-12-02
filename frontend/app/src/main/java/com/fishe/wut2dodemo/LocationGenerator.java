@@ -42,10 +42,14 @@ public class LocationGenerator implements
      * @param context  The context that calls this method.
      */
     public LocationGenerator(Context context, LocationUpdate locationUpdate) {
+        Log.i(TAG, "Initialising LocationGenerator.");
         initialiseGoogleApiClient(context);
         createLocationRequest();
         mLocationUpdate = locationUpdate;
         mContext = context;
+        if (mGoogleApiClient.isConnecting()) {
+            Log.i(TAG, "GoogleApiClient is connecting.");
+        }
     }
 
     private void initialiseGoogleApiClient(Context context) {
@@ -100,6 +104,7 @@ public class LocationGenerator implements
         try {
             Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
             if (location != null) {
+                Log.i(TAG, "Location isn't null.");
                 mLocationUpdate.updateLocation(location);
             }
 
@@ -107,7 +112,7 @@ public class LocationGenerator implements
                     mGoogleApiClient, mLocationRequest, this);
             isGeneratingLocation = true;
         } catch (SecurityException se) {
-            Log.i(TAG, "Security Exception caught.");
+            Log.i(TAG, "Security Exception caught: " + se.getMessage());
             isGeneratingLocation = false;
         }
     }
@@ -121,7 +126,7 @@ public class LocationGenerator implements
     }
 
     public void resumeLocationUpdates() {
-        if (!mGoogleApiClient.isConnected()) {
+        if (!mGoogleApiClient.isConnected() && !mGoogleApiClient.isConnecting()) {
             mGoogleApiClient.connect();
         }
 
@@ -130,7 +135,7 @@ public class LocationGenerator implements
             LocationServices.FusedLocationApi.requestLocationUpdates(
                     mGoogleApiClient, mLocationRequest, this);
         } catch (SecurityException se) {
-            Log.i(TAG, "Security Exception caught.");
+            Log.i(TAG, "Security Exception caught: " + se.getMessage());
             isGeneratingLocation = false;
         }
     }
@@ -145,6 +150,7 @@ public class LocationGenerator implements
         mGoogleApiClient.disconnect();
     }
 
+    public GoogleApiClient getGoogleApiClient() { return mGoogleApiClient; }
     public boolean isGeneratingLocation() {
         return isGeneratingLocation;
     }
