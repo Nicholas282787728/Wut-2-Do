@@ -3,7 +3,7 @@ package com.fishe.wut2dodemo;
 import android.content.Context;
 import android.util.Log;
 
-import com.fishe.wut2dodemo.user.QuestionSharedPreference;
+import com.fishe.wut2dodemo.logic.user.QuestionSharedPreference;
 
 import java.util.ArrayList;
 import java.util.Collections;

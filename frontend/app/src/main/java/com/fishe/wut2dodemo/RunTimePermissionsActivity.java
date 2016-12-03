@@ -1,10 +1,7 @@
 package com.fishe.wut2dodemo;
 
-import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -21,9 +18,18 @@ import android.widget.TextView;
  */
 public abstract class RuntimePermissionsActivity extends AppCompatActivity {
 
-    public static final String FINE_LOCATION_PERMISSION = android.Manifest.permission.ACCESS_FINE_LOCATION;
-    public static final String SUBSEQUENT_REQUEST_FOR_PERMISSION = "Please give permission " +
-            " to access your location to enjoy the full functionalities of our awesome application.";
+    private static final String FINE_LOCATION_PERMISSION = android.Manifest.permission.ACCESS_FINE_LOCATION;
+
+    private static final String PERMISSION_GRANTED_MESSAGE = "Yay you can now enjoy the full " +
+            "functionalities of our awesome application. ˆˆ";
+    private static final String SUBSEQUENT_REQUEST_FOR_PERMISSION_MESSAGE = "Please give permission "
+            + "to access your location to enjoy the full functionalities of our awesome application. :)";
+    private static final String STOP_REQUEST_FOR_PERMISSION_MESSAGE = "You will not be able to "
+            + "enjoy the full functionalities of our awesome application :(.";
+    private static final String GRANT_PERMISSION_STRING = "GRANT PERMISSION";
+
+    private static final int THREE = 3;
+    private static final int PERMISSION_INDEX = 0;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -39,25 +45,86 @@ public abstract class RuntimePermissionsActivity extends AppCompatActivity {
      *                      Only takes on 2 values: PERMISSION_GRANTED or PERMISSION_DENIED.
      */
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+    public void onRequestPermissionsResult(final int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (isPermissionGranted()) {
-            Log.i(this.getLocalClassName(), "Permissions are granted.");
+        if (grantResults[PERMISSION_INDEX] == PackageManager.PERMISSION_GRANTED) {
+
+            Log.i(this.getLocalClassName(), "Permission is granted with code:" + requestCode);
             onPermissionsGranted(requestCode);
-        } else {
-            Snackbar snackbar =  Snackbar.make(findViewById(android.R.id.content),
-                    SUBSEQUENT_REQUEST_FOR_PERMISSION, Snackbar.LENGTH_LONG);
-            View snackbarView = snackbar.getView();
-            TextView textView= (TextView) snackbarView.findViewById(android.support.design.R.id.snackbar_text);
-            textView.setMaxLines(3);
-            snackbar.show();
+        } else if (grantResults[PERMISSION_INDEX] == PackageManager.PERMISSION_DENIED) {
+
+            Log.i(this.getLocalClassName(), "Permission is not granted with code: " + requestCode);
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    android.Manifest.permission.ACCESS_FINE_LOCATION)) {
+
+                Log.i(this.getLocalClassName(), "Showing request permission rationale.");
+                onPermissionsNotGranted(requestCode);
+            } else {
+
+                Log.i(this.getLocalClassName(), "User has selected \"Never ask again\" option.");
+                onPermissionsPermanentlyNotGranted();
+            }
+
         }
     }
 
-    protected boolean isPermissionGranted() {
-        return ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED;
+    /**
+     * When user chooses to grant permission request, shows the user
+     * a message informing him that he / she has successfully granted permission.
+     * @param requestCode   Identifier for the request that was made.
+     */
+    private void onPermissionsGranted(final int requestCode) {
+        Snackbar.make(findViewById(android.R.id.content), PERMISSION_GRANTED_MESSAGE, Snackbar.LENGTH_LONG).show();
+    }
+
+    /**
+     * When user chooses not to grant permission request, shows the user
+     * a message informing that he / she is unable to enjoy full functionalities of the application
+     * and prompts the user to grant permission request.
+     * @param requestCode   Identifier for the request that was made.
+     */
+    private void onPermissionsNotGranted(final int requestCode) {
+        Snackbar snackbar =  Snackbar.make(findViewById(android.R.id.content),
+                SUBSEQUENT_REQUEST_FOR_PERMISSION_MESSAGE, Snackbar.LENGTH_LONG);
+        setSnackbarAction(snackbar, requestCode);
+        setSnackbarMaxLines(snackbar, THREE);
+        snackbar.show();
+    }
+
+    /**
+     * Sets a clickable action to the snackbar, allowing the user to grant permission on click.
+     * @param snackbar      The snackbar to add the clickable action to.
+     * @param requestCode   Identifier for the request that was made.
+     */
+    private void setSnackbarAction(Snackbar snackbar, final int requestCode) {
+        snackbar.setAction(GRANT_PERMISSION_STRING, new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ActivityCompat.requestPermissions(RuntimePermissionsActivity.this,
+                        new String[]{FINE_LOCATION_PERMISSION}, requestCode);
+            }
+        });
+    }
+
+    /**
+     * Sets the maximum number of lines shown in snackbar to prevent truncation.
+     */
+    private void setSnackbarMaxLines(Snackbar snackbar, int maxLines) {
+        View snackbarView = snackbar.getView();
+        TextView textView= (TextView) snackbarView.findViewById(android.support.design.R.id.snackbar_text);
+        textView.setMaxLines(maxLines);
+    }
+
+    /**
+     * When user checks box "Never ask again" for the permission request, shows the user
+     * a message informing that he / she is unable to enjoy full functionalities of the application.
+     */
+    private void onPermissionsPermanentlyNotGranted() {
+        Snackbar snackbar =  Snackbar.make(findViewById(android.R.id.content),
+                STOP_REQUEST_FOR_PERMISSION_MESSAGE, Snackbar.LENGTH_LONG);
+        setSnackbarMaxLines(snackbar, THREE);
+        snackbar.show();
     }
 
     /**
@@ -66,33 +133,17 @@ public abstract class RuntimePermissionsActivity extends AppCompatActivity {
      */
     protected void requestAppPermissions(final int requestCode) {
         if (isPermissionGranted()) {
-            Log.i(this.getLocalClassName(), "Permissions already granted.");
+            Log.i(this.getLocalClassName(), "Permissions already granted for code: " + requestCode);
             onPermissionsGranted(requestCode);
         } else {
-            //if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-            //        android.Manifest.permission.ACCESS_FINE_LOCATION)) {
-            if (false) {
-                Log.i(this.getLocalClassName(), "Showing request permission rationale.");
-                Snackbar.make(findViewById(android.R.id.content), "Please give permissions.",
-                        Snackbar.LENGTH_LONG).setAction("GRANT",
-                        new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                ActivityCompat.requestPermissions(RuntimePermissionsActivity.this,
-                                        new String[]{FINE_LOCATION_PERMISSION}, requestCode);
-                            }
-                        }).show();
-            } else {
-                Log.i(this.getLocalClassName(), "Not showing requesting permission rationale.");
-                ActivityCompat.requestPermissions(this, new String[]{
-                        android.Manifest.permission.ACCESS_FINE_LOCATION}, 10);
-            }
+            Log.i(this.getLocalClassName(), "Requesting for permission for code: " + requestCode);
+            ActivityCompat.requestPermissions(this, new String[]{
+                    android.Manifest.permission.ACCESS_FINE_LOCATION}, requestCode);
         }
     }
 
-    /**
-     * Actions to take after permissions have been successfully granted.
-     * @param requestCode   Identifier for the request that was made.
-     */
-    public abstract void onPermissionsGranted(final int requestCode);
+    protected boolean isPermissionGranted() {
+        return ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED;
+    }
 }

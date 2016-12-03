@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -241,11 +243,6 @@ public class ResultPage extends RuntimePermissionsActivity implements LocationGe
     private LatLng userCoordinates;
 
     @Override
-    public void onPermissionsGranted(int requestCode) {
-        Snackbar.make(findViewById(android.R.id.content), "Permissions Received.", Snackbar.LENGTH_SHORT).show();
-    }
-
-    @Override
     public void updateLocation(Location location) {
         Log.i(TAG, "Location is being updated.");
         double latitude = location.getLatitude();
@@ -347,10 +344,9 @@ public class ResultPage extends RuntimePermissionsActivity implements LocationGe
         protected String doInBackground(String... urls) {
             String result = "";
             URL url;
-            HttpURLConnection urlConnection = null;
+            HttpURLConnection urlConnection;
 
             try {
-                Log.i(TAG, "Am I here?");
                 url = new URL(urls[0]);
                 urlConnection = (HttpURLConnection)url.openConnection();
                 InputStream in = urlConnection.getInputStream();
@@ -374,8 +370,6 @@ public class ResultPage extends RuntimePermissionsActivity implements LocationGe
                 }
 
 
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -401,7 +395,7 @@ public class ResultPage extends RuntimePermissionsActivity implements LocationGe
                 locationDetails = new ArrayList<String>();
                 sorting = new ArrayList<DetailReview>();
 
-                for(int i =0; i< array.length(); i++){
+                for(int i = 0; i< array.length(); i++){
                     try {
                         JSONObject jsonPart = array.getJSONObject(i);
                         temp.add(jsonPart.getString("name")+ "\r\n" + jsonPart.getString("address")
@@ -482,25 +476,11 @@ public class ResultPage extends RuntimePermissionsActivity implements LocationGe
         dialog.setInverseBackgroundForced(false);
         dialog.show();
 
-
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
+                locationGenerator.lockThreadUntilConnectionIsUp();
 
-                Object mPauseLock = new Object();
-                synchronized (mPauseLock) {
-                    while (locationGenerator.getGoogleApiClient().isConnecting()
-                            && !locationGenerator.getGoogleApiClient().isConnected()) {
-                        try {
-                            Log.i(TAG, "Waiting for GoogleApiClient to connect.");
-                            mPauseLock.wait();
-                            mPauseLock.notifyAll();
-                        } catch (InterruptedException ie) {
-                            Log.i(TAG, "InterruptedException caught.");
-                        }
-                    }
-                    Log.i(TAG, "After pausing for GoogleApiClient to connect.");
-                }
                 nameRe = (TextView)findViewById(R.id.resultPg);
                 String searchQuery = "";
                 category = "";
@@ -511,7 +491,7 @@ public class ResultPage extends RuntimePermissionsActivity implements LocationGe
 
                 Log.i("Code", code);
                 if(code.equals("category")) {
-                    nameRe.setText(extras.getString("name"));
+                    runOnUi(extras.getString("name"));
                     //ensure the string is in proper format to be passed into url
                     category = extras.getString("name").toLowerCase();
                     category = category.replace(" ","+");
@@ -543,8 +523,7 @@ public class ResultPage extends RuntimePermissionsActivity implements LocationGe
                     searchQuery = extras.getString("name");
                     searchQuery = searchQuery.replace("+"," ");
                     searchQuery = toUpperCase(searchQuery);
-
-                    nameRe.setText(searchQuery);
+                    runOnUi(searchQuery);
 
                     searchResult = extras.getString("name").toLowerCase();
                     searchResult = searchResult.replace(" ","+");
@@ -568,10 +547,11 @@ public class ResultPage extends RuntimePermissionsActivity implements LocationGe
                 //random result here
                 else {
                     Log.i(TAG, "Choosing");
-                    randomChoose = new RandomChoose(getApplicationContext());
-                    category = randomChoose.getRandomCategory();
+                    //randomChoose = new RandomChoose(getApplicationContext());
+                    //category = randomChoose.getRandomCategory();
+                    category = "Cinema";
                     Log.i("Random", category);
-                    nameRe.setText(category);
+                    runOnUi(category);
                     category = category.toLowerCase();
                     category = category.replace(" ","+");
                     String url = "http://orbital_wut_2_do.net16.net/copy/output/show_details.php?category=" + category
@@ -594,10 +574,17 @@ public class ResultPage extends RuntimePermissionsActivity implements LocationGe
                 // after finishing, close the progress bar
                 dialog.dismiss();
             }
+
+            private void runOnUi(final String words) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        nameRe.setText(words);
+                    }
+                });
+            }
         };
-
         new Thread(runnable).start();
-
     }
 
     //convert the first letter of each word to uppercase
@@ -612,15 +599,16 @@ public class ResultPage extends RuntimePermissionsActivity implements LocationGe
         return sb.toString().trim();
     }
 
-    /*@Override
+    @Override
     protected void onResume() {
         Log.i(TAG, "Resuming activity.");
         if (locationGenerator != null) {
             locationGenerator.resumeLocationUpdates();
         }
-    }*/
+        super.onResume();
+    }
 
-/*    @Override
+    @Override
     protected void onPause() {
         Log.i(TAG, "Pausing activity.");
         if (locationGenerator != null) {
@@ -636,5 +624,5 @@ public class ResultPage extends RuntimePermissionsActivity implements LocationGe
             locationGenerator.stopLocationUpdates();
         }
         super.onStop();
-    }*/
+    }
 }

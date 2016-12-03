@@ -13,7 +13,7 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.fishe.wut2dodemo.user.SaveSharedPreference;
+import com.fishe.wut2dodemo.model.user.SaveSharedPreference;
 
 import java.util.Locale;
 

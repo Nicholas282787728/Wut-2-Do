@@ -15,9 +15,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.fishe.wut2dodemo.user.LoginActivity;
-import com.fishe.wut2dodemo.user.QuestionSharedPreference;
-import com.fishe.wut2dodemo.user.SaveSharedPreference;
+import com.fishe.wut2dodemo.logic.user.LoginActivity;
+import com.fishe.wut2dodemo.logic.user.QuestionSharedPreference;
+import com.fishe.wut2dodemo.model.user.SaveSharedPreference;
 
 import org.json.JSONArray;
 import org.json.JSONException;

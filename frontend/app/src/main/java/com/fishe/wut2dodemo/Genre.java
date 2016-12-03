@@ -12,8 +12,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.fishe.wut2dodemo.user.LoginActivity;
-import com.fishe.wut2dodemo.user.SaveSharedPreference;
+import com.fishe.wut2dodemo.logic.user.LoginActivity;
+import com.fishe.wut2dodemo.model.user.SaveSharedPreference;
 
 import java.util.ArrayList;
 

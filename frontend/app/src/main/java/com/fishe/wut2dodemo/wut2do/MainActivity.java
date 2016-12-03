@@ -3,7 +3,6 @@ package com.fishe.wut2dodemo.wut2do;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -18,16 +17,15 @@ import com.fishe.wut2dodemo.ResultPage;
 import com.fishe.wut2dodemo.RuntimePermissionsActivity;
 import com.fishe.wut2dodemo.Search;
 import com.fishe.wut2dodemo.Setting;
-import com.fishe.wut2dodemo.user.LoginActivity;
-import com.fishe.wut2dodemo.user.QuestionSharedPreference;
-import com.fishe.wut2dodemo.user.SaveSharedPreference;
+import com.fishe.wut2dodemo.logic.user.LoginActivity;
+import com.fishe.wut2dodemo.logic.user.QuestionSharedPreference;
+import com.fishe.wut2dodemo.model.user.SaveSharedPreference;
 
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
 import uk.co.deanwild.materialshowcaseview.ShowcaseConfig;
 
 public class MainActivity extends RuntimePermissionsActivity {
 
-    public static final String TAG = MainActivity.class.getSimpleName();
     private ImageButton search, genre, random, login;
     final String PREF_NAME = "MyPrefs";
 
@@ -146,13 +144,6 @@ public class MainActivity extends RuntimePermissionsActivity {
             QuestionSharedPreference.setDefault(getApplicationContext());
             Log.i("User", "Logged out");
         }
-    }
-
-    @Override
-    public void onPermissionsGranted(int requestCode) {
-        Log.i(TAG, "Permissions granted with request code: " + requestCode);
-        Snackbar.make(findViewById(android.R.id.content), "Yay you can now enjoy the full " +
-                "functionalities of our application. ˆˆ", Snackbar.LENGTH_LONG).show();
     }
 
     private void doTutorial(){

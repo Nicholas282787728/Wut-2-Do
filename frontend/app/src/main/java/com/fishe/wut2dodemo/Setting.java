@@ -6,8 +6,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
-import com.fishe.wut2dodemo.user.QuestionSharedPreference;
-import com.fishe.wut2dodemo.user.SaveSharedPreference;
+import com.fishe.wut2dodemo.logic.user.QuestionSharedPreference;
+import com.fishe.wut2dodemo.model.user.SaveSharedPreference;
 
 public class Setting extends AppCompatActivity {
 

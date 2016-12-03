@@ -60,16 +60,16 @@
             android:name=".MapView"
             android:label="@string/title_activity_map_view" />
         <activity
-            android:name=".user.LoginActivity"
+            android:name=".logic.user.LoginActivity"
             android:label="Login" />
         <activity
-            android:name=".user.SignupActivity"
+            android:name=".logic.user.SignupActivity"
             android:label="Sign Up" />
         <activity
-            android:name=".user.QuestionUser"
+            android:name=".logic.user.QuestionUser"
             android:label="Question 1" />
         <activity
-            android:name=".user.QuestionUser2"
+            android:name=".logic.user.QuestionUser2"
             android:label="Question 2" />
         <activity
             android:name=".ReviewActivity"
@@ -78,7 +78,7 @@
             android:name=".About"
             android:label="Credits" />
         <activity
-            android:name=".user.QuestionUser3"
+            android:name=".logic.user.QuestionUser3"
             android:label="Question 3"></activity>
         <activity android:name=".Tutorial"></activity>
     </application>

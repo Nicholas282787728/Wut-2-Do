@@ -42,12 +42,6 @@ public class MapView extends RuntimePermissionsActivity implements OnMapReadyCal
     }
 
     @Override
-    public void onPermissionsGranted(int requestCode) {
-        Snackbar.make(findViewById(android.R.id.content), "Permissions Received.", Snackbar.LENGTH_SHORT).show();
-    }
-
-
-    @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         latlngList = new ArrayList<String>();

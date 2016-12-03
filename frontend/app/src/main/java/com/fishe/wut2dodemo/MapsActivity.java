@@ -6,8 +6,6 @@ import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -20,8 +18,8 @@ import android.widget.ListView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
-import com.fishe.wut2dodemo.user.LoginActivity;
-import com.fishe.wut2dodemo.user.SaveSharedPreference;
+import com.fishe.wut2dodemo.logic.user.LoginActivity;
+import com.fishe.wut2dodemo.model.user.SaveSharedPreference;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -154,6 +152,7 @@ class DetailMapAdapter extends ArrayAdapter<DetailMapReview> {
 
 public class MapsActivity extends RuntimePermissionsActivity implements OnMapReadyCallback, LocationGenerator.LocationUpdate {
 
+    public static final String TAG = MapsActivity.class.getSimpleName();
     ListView listView, listView2;
     private LocationGenerator locationGenerator;
     private GoogleMap mMap;
@@ -169,11 +168,6 @@ public class MapsActivity extends RuntimePermissionsActivity implements OnMapRea
     ArrayList<String> reviewList;
     ArrayList<DetailMapReview> itemList;
     String[] addressResult;
-
-    @Override
-    public void onPermissionsGranted(int requestCode) {
-        Snackbar.make(findViewById(android.R.id.content), "Permissions Received.", Snackbar.LENGTH_SHORT).show();
-    }
 
     @Override
     public void updateLocation(Location location) {
@@ -259,12 +253,12 @@ public class MapsActivity extends RuntimePermissionsActivity implements OnMapRea
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        locationGenerator = new LocationGenerator(this, this);
         setContentView(R.layout.activity_maps);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-        locationGenerator = new LocationGenerator(this, this);
 
     }
     @Override
@@ -434,23 +428,29 @@ public class MapsActivity extends RuntimePermissionsActivity implements OnMapRea
 
     @Override
     protected void onResume() {
+        Log.i(TAG, "Resuming activity.");
         if (locationGenerator != null) {
             locationGenerator.resumeLocationUpdates();
         }
+        super.onResume();
     }
 
     @Override
     protected void onPause() {
+        Log.i(TAG, "Pausing activity.");
         if (locationGenerator != null) {
             locationGenerator.pauseLocationUpdates();
         }
+        super.onPause();
     }
 
     @Override
     protected void onStop() {
+        Log.i(TAG, "Stopping activity.");
         if (locationGenerator != null) {
             locationGenerator.stopLocationUpdates();
         }
+        super.onStop();
     }
 }
 /*

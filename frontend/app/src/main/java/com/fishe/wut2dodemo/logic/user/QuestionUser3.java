@@ -1,4 +1,4 @@
-package com.fishe.wut2dodemo.user;
+package com.fishe.wut2dodemo.logic.user;
 
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
