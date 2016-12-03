@@ -3,8 +3,7 @@ package com.fishe.wut2dodemo;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -16,12 +15,12 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
 
-public class MapView extends RuntimePermissionsActivity implements OnMapReadyCallback, LocationGenerator.LocationUpdate {
+public class MapView extends LocationPermissionActivity implements OnMapReadyCallback, LocationGenerator.LocationUpdate {
 
+    public static final String TAG = MapView.class.getSimpleName();
     private GoogleMap mMap;
     ArrayList<String> itemList;
     ArrayList<String> latlngList;
-    private LocationGenerator locationGenerator;
     private LatLng userCoordinates;
 
     @Override
@@ -35,6 +34,9 @@ public class MapView extends RuntimePermissionsActivity implements OnMapReadyCal
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map_view);
+
+        requestAppPermissions(9998);
+        requestTurnOnGps();
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -49,14 +51,24 @@ public class MapView extends RuntimePermissionsActivity implements OnMapReadyCal
         Intent i = getIntent();
         latlngList = i.getStringArrayListExtra("latlng");
         itemList = i.getStringArrayListExtra("location");
-        Bundle extras = getIntent().getExtras();
-        locationGenerator = new LocationGenerator(this, this);
-        mMap.addMarker(new MarkerOptions().position(userCoordinates).
-                title("User location").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                locationGenerator.lockThreadUntilConnectionIsUp();
 
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(userCoordinates));
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(userCoordinates, 16));
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mMap.addMarker(new MarkerOptions().position(userCoordinates).
+                                title("User location").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
 
+                        mMap.moveCamera(CameraUpdateFactory.newLatLng(userCoordinates));
+                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(userCoordinates, 16));
+                    }
+                });
+            }
+        };
+        new Thread(runnable).start();
 
         for(int j=0; j<latlngList.size();j++){
             String[] address = itemList.get(j).split("\n");
@@ -75,23 +87,29 @@ public class MapView extends RuntimePermissionsActivity implements OnMapReadyCal
 
     @Override
     protected void onResume() {
+        Log.i(TAG, "Resuming activity.");
         if (locationGenerator != null) {
             locationGenerator.resumeLocationUpdates();
         }
+        super.onResume();
     }
 
     @Override
     protected void onPause() {
+        Log.i(TAG, "Pausing activity.");
         if (locationGenerator != null) {
             locationGenerator.pauseLocationUpdates();
         }
+        super.onPause();
     }
 
     @Override
     protected void onStop() {
+        Log.i(TAG, "Stopping activity.");
         if (locationGenerator != null) {
             locationGenerator.stopLocationUpdates();
         }
+        super.onStop();
     }
 }
 

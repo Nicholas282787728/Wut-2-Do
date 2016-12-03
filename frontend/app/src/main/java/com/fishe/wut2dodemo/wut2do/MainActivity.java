@@ -2,6 +2,7 @@ package com.fishe.wut2dodemo.wut2do;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -14,7 +15,7 @@ import com.fishe.wut2dodemo.About;
 import com.fishe.wut2dodemo.Genre;
 import com.fishe.wut2dodemo.R;
 import com.fishe.wut2dodemo.ResultPage;
-import com.fishe.wut2dodemo.RuntimePermissionsActivity;
+import com.fishe.wut2dodemo.LocationPermissionActivity;
 import com.fishe.wut2dodemo.Search;
 import com.fishe.wut2dodemo.Setting;
 import com.fishe.wut2dodemo.logic.user.LoginActivity;
@@ -24,8 +25,9 @@ import com.fishe.wut2dodemo.model.user.SaveSharedPreference;
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
 import uk.co.deanwild.materialshowcaseview.ShowcaseConfig;
 
-public class MainActivity extends RuntimePermissionsActivity {
+public class MainActivity extends LocationPermissionActivity {
 
+    public static final String TAG = MainActivity.class.getSimpleName();
     private ImageButton search, genre, random, login;
     final String PREF_NAME = "MyPrefs";
 
@@ -114,10 +116,10 @@ public class MainActivity extends RuntimePermissionsActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (!isPermissionGranted()) {
-            Log.i("MainActivity", "Requesting for permissions.");
-            requestAppPermissions(9998);
-        }
+
+        requestAppPermissions(9998);
+        requestTurnOnGps();
+
         getSupportActionBar().setDisplayShowHomeEnabled(true);
    //     getSupportActionBar().setLogo(R.drawable.app);
    //     getSupportActionBar().setDisplayUseLogoEnabled(true);
@@ -163,5 +165,10 @@ public class MainActivity extends RuntimePermissionsActivity {
                 "Create an account or log in", "Got it!");
 
         sequence.start();
+    }
+
+    @Override
+    public void updateLocation(Location location) {
+        //TODO:??
     }
 }

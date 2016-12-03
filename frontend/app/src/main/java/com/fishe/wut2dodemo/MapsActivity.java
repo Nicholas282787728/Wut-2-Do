@@ -150,11 +150,10 @@ class DetailMapAdapter extends ArrayAdapter<DetailMapReview> {
     }
 }
 
-public class MapsActivity extends RuntimePermissionsActivity implements OnMapReadyCallback, LocationGenerator.LocationUpdate {
+public class MapsActivity extends LocationPermissionActivity implements OnMapReadyCallback, LocationGenerator.LocationUpdate {
 
     public static final String TAG = MapsActivity.class.getSimpleName();
     ListView listView, listView2;
-    private LocationGenerator locationGenerator;
     private GoogleMap mMap;
     private LatLng userCoordinates;
     String address;
@@ -253,12 +252,14 @@ public class MapsActivity extends RuntimePermissionsActivity implements OnMapRea
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        locationGenerator = new LocationGenerator(this, this);
         setContentView(R.layout.activity_maps);
+        requestAppPermissions(9998);
+        requestTurnOnGps();
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
 
     }
     @Override
@@ -308,7 +309,9 @@ public class MapsActivity extends RuntimePermissionsActivity implements OnMapRea
 
 
     @Override
-    public void onMapReady(GoogleMap googleMap) {
+    public void onMapReady(final GoogleMap googleMap) {
+        requestAppPermissions(9998);
+        requestTurnOnGps();
         mMap = googleMap;
         Intent receive = getIntent();
         latlng = receive.getStringExtra("latlng");
@@ -322,27 +325,25 @@ public class MapsActivity extends RuntimePermissionsActivity implements OnMapRea
         Log.i("shop name", addressName);
 
         addressName = addressResult[0].toLowerCase();
-        Log.wtf("shopv2 name", addressName);
+        Log.i("shopv2 name", addressName);
 
-        addressName = addressName.replace(" ","+");
-        Log.d("shopv3 name", addressName);
+        addressName = addressName.replace(" ", "+");
+        Log.i("shopv3 name", addressName);
 
         //  final ArrayList<String>
-        temp = new ArrayList<String >();
-        if(locationinformation[0].trim().isEmpty()){
+        temp = new ArrayList<String>();
+        if (locationinformation[0].trim().isEmpty()) {
             locationinformation[0] = "Website: N/A";
         }
 
-        for(int i = 0;i<locationinformation.length;i++){
+        for (int i = 0; i < locationinformation.length; i++) {
             temp.add(locationinformation[i]);
         }
 
-
-        url = "http://orbital_wut_2_do.net16.net/copy/output/show_reviews.php?postal_code=" + postal + "&unit_no="+ unit_no +
-        "&shop_name=" + addressName;
+        url = "http://orbital_wut_2_do.net16.net/copy/output/show_reviews.php?postal_code=" + postal + "&unit_no=" + unit_no +
+                "&shop_name=" + addressName;
         //url = "http://orbital_wut_2_do.net16.net/copy/output/show_reviews.php?shop_name="
-          //     +"east+coast+park"+"&unit_no=&postal_code=449876";
-
+        //     +"east+coast+park"+"&unit_no=&postal_code=449876";
 
         DownloadTask task = new DownloadTask();
 
@@ -359,13 +360,12 @@ public class MapsActivity extends RuntimePermissionsActivity implements OnMapRea
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, temp);
         listView = (ListView) findViewById(R.id.listView);
         listView.setAdapter(arrayAdapter);
-
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String web = temp.get(position);
-                if(position==0){
-                    if(!web.equals("Website: N/A")) {
+                if (position == 0) {
+                    if (!web.equals("Website: N/A")) {
                         Uri uri = Uri.parse(temp.get(position));
                         Log.i("Check", "Test");
                         Intent browserIntent = new Intent(Intent.ACTION_VIEW, uri);
@@ -383,17 +383,26 @@ public class MapsActivity extends RuntimePermissionsActivity implements OnMapRea
         });
 
 
-        String[] result = latlng.split(",");
-        Bundle extras = getIntent().getExtras();
+        final String[] result = latlng.split(",");
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                locationGenerator.lockThreadUntilConnectionIsUp();
 
-        mMap.addMarker(new MarkerOptions().position(userCoordinates).
-                title("User location").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
-
-        LatLng placeOfInterest = new LatLng(Double.parseDouble(result[0]),Double.parseDouble(result[1]));
-        mMap.addMarker(new MarkerOptions().position(placeOfInterest).title(addressResult[0]).snippet(addressResult[1]));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(placeOfInterest));
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(placeOfInterest,16));
-
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mMap.addMarker(new MarkerOptions().position(userCoordinates).
+                                title("User location").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+                        LatLng placeOfInterest = new LatLng(Double.parseDouble(result[0]), Double.parseDouble(result[1]));
+                        mMap.addMarker(new MarkerOptions().position(placeOfInterest).title(addressResult[0]).snippet(addressResult[1]));
+                        mMap.moveCamera(CameraUpdateFactory.newLatLng(placeOfInterest));
+                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(placeOfInterest, 16));
+                    }
+                });
+            }
+        };
+        new Thread(runnable).start();
     }
 
     public String findPostal(String str){

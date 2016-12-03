@@ -6,9 +6,6 @@ import android.content.Intent;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -32,7 +29,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -223,7 +219,7 @@ class DetailRAdapter extends ArrayAdapter<DetailReview> {
 }
 
 
-public class ResultPage extends RuntimePermissionsActivity implements LocationGenerator.LocationUpdate {
+public class ResultPage extends LocationPermissionActivity implements LocationGenerator.LocationUpdate {
     public static final String TAG = ResultPage.class.getSimpleName();
     ListView listView;
     ArrayList<Details> itemList;
@@ -239,7 +235,6 @@ public class ResultPage extends RuntimePermissionsActivity implements LocationGe
     HashMap<String,Integer> map;
     ArrayList<String> name;
     RandomChoose randomChoose;
-    private LocationGenerator locationGenerator;
     private LatLng userCoordinates;
 
     @Override
@@ -461,20 +456,17 @@ public class ResultPage extends RuntimePermissionsActivity implements LocationGe
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        locationGenerator = new LocationGenerator(this, this);
-        if (!isPermissionGranted()) {
-            Log.i(TAG, "Requesting for permissions.");
-            requestAppPermissions(9998);
-        }
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_result_page);
+
+        requestAppPermissions(9998);
+        requestTurnOnGps();
 
         dialog = new ProgressDialog(this);
         dialog.setMessage("Downloading information ");
         dialog.setCancelable(false);
         dialog.setInverseBackgroundForced(false);
-        dialog.show();
+        dialog.show(); // on main thread
 
         Runnable runnable = new Runnable() {
             @Override
@@ -547,9 +539,8 @@ public class ResultPage extends RuntimePermissionsActivity implements LocationGe
                 //random result here
                 else {
                     Log.i(TAG, "Choosing");
-                    //randomChoose = new RandomChoose(getApplicationContext());
-                    //category = randomChoose.getRandomCategory();
-                    category = "Cinema";
+                    randomChoose = new RandomChoose(getApplicationContext());
+                    category = randomChoose.getRandomCategory();
                     Log.i("Random", category);
                     runOnUi(category);
                     category = category.toLowerCase();
