@@ -310,8 +310,6 @@ public class MapsActivity extends LocationPermissionActivity implements OnMapRea
 
     @Override
     public void onMapReady(final GoogleMap googleMap) {
-        requestAppPermissions(9998);
-        requestTurnOnGps();
         mMap = googleMap;
         Intent receive = getIntent();
         latlng = receive.getStringExtra("latlng");
@@ -384,6 +382,7 @@ public class MapsActivity extends LocationPermissionActivity implements OnMapRea
 
 
         final String[] result = latlng.split(",");
+        //TODO: Multithreading
         Runnable runnable = new Runnable() {
             @Override
             public void run() {

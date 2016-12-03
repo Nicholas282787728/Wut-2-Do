@@ -471,6 +471,7 @@ public class ResultPage extends LocationPermissionActivity implements LocationGe
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
+                //TODO: Multithreading
                 locationGenerator.lockThreadUntilConnectionIsUp();
 
                 nameRe = (TextView)findViewById(R.id.resultPg);

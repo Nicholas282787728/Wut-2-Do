@@ -17,7 +17,7 @@ import com.google.android.gms.location.LocationServices;
 /**
  * LocationGenerator generates the user's location by using Google Location API.
  */
-class LocationGenerator implements
+public class LocationGenerator implements
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         LocationListener {
@@ -29,8 +29,8 @@ class LocationGenerator implements
 
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
-    private LocationUpdate mLocationUpdate;
-    private Context mContext;
+    private final LocationUpdate mLocationUpdate;
+    private final Activity mActivity;
 
     /**
      * Locks the thread in place while waiting for GoogleApiClient to finish connection.
@@ -47,15 +47,15 @@ class LocationGenerator implements
 
     /**
      * Initialises the necessary components to generate user's location.
-     * @param context           The Context that called this constructor.
+     * @param activity          The Activity that called this constructor.
      * @param locationUpdate    The Activity implementing LocationUpdate that called this constructor.
      */
-    LocationGenerator(Context context, LocationUpdate locationUpdate) {
+    LocationGenerator(Activity activity, LocationUpdate locationUpdate) {
         Log.i(TAG, "Initialising LocationGenerator.");
-        initialiseGoogleApiClient(context);
+        initialiseGoogleApiClient(activity);
         createLocationRequest();
         mLocationUpdate = locationUpdate;
-        mContext = context;
+        mActivity = activity;
     }
 
     /**
@@ -106,15 +106,36 @@ class LocationGenerator implements
     public void onConnectionFailed(@NonNull ConnectionResult result) {
         Log.i("TAG", "GoogleApiClient failed to connect.");
 
-        if (result.hasResolution() && mContext instanceof Activity) {
+        if (result.hasResolution()) {
             try {
-                Activity activity = (Activity) mContext;
-                result.startResolutionForResult(activity, CONNECTION_FAILURE_RESOLUTION_REQUEST);
+                result.startResolutionForResult(mActivity, CONNECTION_FAILURE_RESOLUTION_REQUEST);
             } catch (IntentSender.SendIntentException e) {
                 Log.i(TAG, e.getMessage());
             }
         } else {
             Log.i(TAG, "Location services connection failed with code: " + result.getErrorCode());
+        }
+    }
+
+    //TODO: Comments
+    public void onCallerActivityResult(int requestCode, int resultCode) {
+        switch (requestCode) {
+            case CONNECTION_FAILURE_RESOLUTION_REQUEST:
+                switch (resultCode) {
+                    case Activity.RESULT_OK:
+                        Log.i(mActivity.getLocalClassName(), "GoogleApiClient resolution success.");
+                        break;
+                    case Activity.RESULT_CANCELED:
+                        Log.i(mActivity.getLocalClassName(), "GoogleApiClient resolution unsuccessful.");
+                        break;
+                    default:
+                        Log.i(mActivity.getLocalClassName(), "GoogleApiClient resolution went wrong.");
+                        break;
+                }
+                break;
+            default:
+                Log.i(mActivity.getLocalClassName(), "Resolution request code unidentified");
+                break;
         }
     }
 
@@ -124,18 +145,11 @@ class LocationGenerator implements
      */
     @Override
     public void onConnected(Bundle bundle) {
+        assert mConnectionLock != null;
         Log.i(TAG, "GoogleApiClient connected.");
         try {
-            Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-            if (location != null) {
-                Log.i(TAG, "Able to detect user's previous location.");
-                mLocationUpdate.updateLocation(location);
-            }
-
-            synchronized (mConnectionLock) {
-                mConnectionLock.notifyAll();
-            }
-
+            retrievePreviousLocationIfAvailable();
+            unlockConnectionLockThread();
             LocationServices.FusedLocationApi.requestLocationUpdates(
                     mGoogleApiClient, mLocationRequest, this);
         } catch (SecurityException se) {
@@ -144,10 +158,38 @@ class LocationGenerator implements
     }
 
     /**
+     * Retrieves the user's last known location if available,
+     * to get the app continue functioning while waiting for newer location updates which
+     * can take longer time.
+     */
+    private void retrievePreviousLocationIfAvailable() {
+        try {
+            Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+            if (location != null) {
+                Log.i(TAG, "Able to detect user's previous location.");
+                mLocationUpdate.updateLocation(location);
+            }
+        } catch (SecurityException se) {
+            Log.i(TAG, "Security Exception caught: " + se.getMessage());
+        }
+    }
+
+    /**
+     * Unlocks the running thread that is locked while waiting for GoogleApiConnection to connect.
+     */
+    private void unlockConnectionLockThread() {
+        synchronized (mConnectionLock) {
+            mConnectionLock.notifyAll();
+        }
+    }
+
+    /**
      * Locks the running thread until GoogleApiConnection is connected, so that activities that
      * require user location will not get NullPointerException.
      */
     void lockThreadUntilConnectionIsUp() {
+        assert mConnectionLock != null;
+
         synchronized (mConnectionLock) {
             while (mGoogleApiClient.isConnecting()
                     || !mGoogleApiClient.isConnected()) {
@@ -174,7 +216,7 @@ class LocationGenerator implements
     /**
      * Reconnects GoogleApiClient and request for location updates.
      */
-    //TODO: On resume, lock thread also. Assertions
+    //TODO: On resume, lock thread also.
     void resumeLocationUpdates() {
         if (!mGoogleApiClient.isConnected() && !mGoogleApiClient.isConnecting()) {
             Log.i(TAG, "Resuming GoogleApiClient connection.");

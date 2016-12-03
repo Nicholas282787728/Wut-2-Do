@@ -51,6 +51,7 @@ public class MapView extends LocationPermissionActivity implements OnMapReadyCal
         Intent i = getIntent();
         latlngList = i.getStringArrayListExtra("latlng");
         itemList = i.getStringArrayListExtra("location");
+        //TODO: Multithreading
         Runnable runnable = new Runnable() {
             @Override
             public void run() {

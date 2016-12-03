@@ -21,7 +21,6 @@ import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
-import com.google.android.gms.location.LocationSettingsStates;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 
 /**
@@ -50,6 +49,25 @@ public abstract class LocationPermissionActivity extends AppCompatActivity
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         locationGenerator = new LocationGenerator(this, this);
+    }
+
+    /**
+     * Request location permission from user.
+     * @param requestCode   Identifier for the request that was made.
+     */
+    protected void requestAppPermissions(final int requestCode) {
+        if (!isPermissionGranted()) {
+            Log.i(getLocalClassName(), "Requesting for permission for code: " + requestCode);
+            ActivityCompat.requestPermissions(this, new String[]{
+                    android.Manifest.permission.ACCESS_FINE_LOCATION}, requestCode);
+        } else {
+            Log.i(getLocalClassName(), "Permissions already granted for code: " + requestCode);
+        }
+    }
+
+    protected boolean isPermissionGranted() {
+        return ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED;
     }
 
     /**
@@ -152,27 +170,7 @@ public abstract class LocationPermissionActivity extends AppCompatActivity
     }
 
     /**
-     * Request location permission from user.
-     * @param requestCode   Identifier for the request that was made.
-     */
-    protected void requestAppPermissions(final int requestCode) {
-        if (isPermissionGranted()) {
-            Log.i(getLocalClassName(), "Permissions already granted for code: " + requestCode);
-            showPermissionGrantedMessage();
-        } else {
-            Log.i(getLocalClassName(), "Requesting for permission for code: " + requestCode);
-            ActivityCompat.requestPermissions(this, new String[]{
-                    android.Manifest.permission.ACCESS_FINE_LOCATION}, requestCode);
-        }
-    }
-
-    protected boolean isPermissionGranted() {
-        return ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED;
-    }
-
-    /**
-     * Request to turn on location services for user.
+     * Requests permission to turn on location services for user if it is currently turned off.
      */
     protected void requestTurnOnGps() {
         Log.i(getLocalClassName(), "Requesting for permission to turn on GPS");
@@ -180,6 +178,10 @@ public abstract class LocationPermissionActivity extends AppCompatActivity
         setCallback(result);
     }
 
+    /**
+     * Checks whether location services is currently turned on.
+     * @return  Result on whether location services is currently turned on.
+     */
     private PendingResult<LocationSettingsResult> initialiseResult() {
         assert locationGenerator != null;
 
@@ -191,8 +193,8 @@ public abstract class LocationPermissionActivity extends AppCompatActivity
                 locationGenerator.getGoogleApiClient(), builder.build());
     }
 
+    //TODO: Understand this code and comments and assertions
     private void setCallback(PendingResult<LocationSettingsResult> result) {
-        final Activity activity = this;
         result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
             @Override
             public void onResult(@NonNull LocationSettingsResult result) {
@@ -209,15 +211,21 @@ public abstract class LocationPermissionActivity extends AppCompatActivity
                         Log.i(getLocalClassName(), "Location settings unable to be changed.");
                         break;
                     default:
-                        Log.i(getLocalClassName(), "LocationSettingsStatusCodes went wrong here");
+                        Log.i(getLocalClassName(), "Location settings went wrong.");
                 }
             }
 
+            /**
+             * Requests permission to turn on location services for user.
+             * @param status    Status on whether it is possible to request permission to turn on
+             *                  location services for user.
+             */
             private void tryResolving(Status status) {
                 try {
                     if (status.hasResolution()) {
                         status.startResolutionForResult(
-                                activity, LOCATION_SERVICES_NOT_GRANTED_RESOLUTION_REQUEST);
+                                LocationPermissionActivity.this,
+                                LOCATION_SERVICES_NOT_GRANTED_RESOLUTION_REQUEST);
                     } else {
                         Log.i(getLocalClassName(), "Location settings unable to be resolved.");
                     }
@@ -228,19 +236,26 @@ public abstract class LocationPermissionActivity extends AppCompatActivity
         });
     }
 
+    /**
+     *
+     * @param requestCode   Identifier for the request that was made.
+     * @param resultCode
+     * @param data          The intent that
+     */
+    //TODO: Comments
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        final LocationSettingsStates states = LocationSettingsStates.fromIntent(getIntent());
         switch (requestCode) {
             case LOCATION_SERVICES_NOT_GRANTED_RESOLUTION_REQUEST:
                 switch (resultCode) {
                     case Activity.RESULT_OK:
-                        // All required changes were successfully made
+                        Log.i(getLocalClassName(), "Location settings resolution success.");
                         break;
                     case Activity.RESULT_CANCELED:
-                        // The user was asked to change settings, but chose not to
+                        Log.i(getLocalClassName(), "Location settings resolution unsuccessful.");
                         break;
                     default:
+                        Log.i(getLocalClassName(), "Location settings resolution went wrong.");
                         break;
                 }
                 break;

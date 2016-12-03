@@ -1,5 +1,6 @@
 package com.fishe.wut2dodemo.wut2do;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
@@ -21,6 +22,7 @@ import com.fishe.wut2dodemo.Setting;
 import com.fishe.wut2dodemo.logic.user.LoginActivity;
 import com.fishe.wut2dodemo.logic.user.QuestionSharedPreference;
 import com.fishe.wut2dodemo.model.user.SaveSharedPreference;
+import com.google.android.gms.location.LocationSettingsStates;
 
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
 import uk.co.deanwild.materialshowcaseview.ShowcaseConfig;
@@ -113,10 +115,14 @@ public class MainActivity extends LocationPermissionActivity {
         startActivity(i);
     }
 
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        locationGenerator.onCallerActivityResult(requestCode, resultCode);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         requestAppPermissions(9998);
         requestTurnOnGps();
 
