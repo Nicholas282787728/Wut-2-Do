@@ -115,6 +115,7 @@ public class MainActivity extends LocationPermissionActivity {
         startActivity(i);
     }
 
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         locationGenerator.onCallerActivityResult(requestCode, resultCode);
@@ -175,6 +176,5 @@ public class MainActivity extends LocationPermissionActivity {
 
     @Override
     public void updateLocation(Location location) {
-        //TODO:??
     }
 }

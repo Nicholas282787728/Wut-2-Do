@@ -382,7 +382,7 @@ public class MapsActivity extends LocationPermissionActivity implements OnMapRea
 
 
         final String[] result = latlng.split(",");
-        //TODO: Multithreading
+
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
@@ -432,6 +432,12 @@ public class MapsActivity extends LocationPermissionActivity implements OnMapRea
         } else {
             return "";
         }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        locationGenerator.onCallerActivityResult(requestCode, resultCode);
     }
 
     @Override

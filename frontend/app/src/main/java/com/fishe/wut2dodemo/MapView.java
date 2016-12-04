@@ -17,10 +17,18 @@ import java.util.ArrayList;
 
 public class MapView extends LocationPermissionActivity implements OnMapReadyCallback, LocationGenerator.LocationUpdate {
 
-    public static final String TAG = MapView.class.getSimpleName();
+    private static final String TAG = MapView.class.getSimpleName();
+
+    private static final String USER_LOCATION_STRING = "User Location";
+    private static final String NEW_LINE = "\n";
+    private static final String COMMA = ",";
+    public static final int LONGITUDE_INDEX = 1;
+    private static final int LATITUDE_INDEX = 0;
+    private static final int NAME_INDEX = 0;
+    private static final int ADDRESS_INDEX = 1;
+    private static final int ARRAY_BASE_INDEX = 0;
+
     private GoogleMap mMap;
-    ArrayList<String> itemList;
-    ArrayList<String> latlngList;
     private LatLng userCoordinates;
 
     @Override
@@ -44,46 +52,55 @@ public class MapView extends LocationPermissionActivity implements OnMapReadyCal
     }
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        locationGenerator.onCallerActivityResult(requestCode, resultCode);
+    }
+
+    @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        latlngList = new ArrayList<String>();
+        Intent intent = getIntent();
+        final ArrayList<String> locationDetailsList = intent.getStringArrayListExtra("latlng");
+        final ArrayList<String> coordinatesList = intent.getStringArrayListExtra("location");
 
-        Intent i = getIntent();
-        latlngList = i.getStringArrayListExtra("latlng");
-        itemList = i.getStringArrayListExtra("location");
-        //TODO: Multithreading
-        Runnable runnable = new Runnable() {
+        new Thread(new Runnable() {
             @Override
             public void run() {
                 locationGenerator.lockThreadUntilConnectionIsUp();
-
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        mMap.addMarker(new MarkerOptions().position(userCoordinates).
-                                title("User location").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
-
-                        mMap.moveCamera(CameraUpdateFactory.newLatLng(userCoordinates));
-                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(userCoordinates, 16));
+                        addUserLocationMarker();
+                        addPlacesLocationMarkers(locationDetailsList, coordinatesList);
                     }
                 });
             }
-        };
-        new Thread(runnable).start();
+        }).start();
+    }
 
-        for(int j=0; j<latlngList.size();j++){
-            String[] address = itemList.get(j).split("\n");
+    private void addUserLocationMarker() {
+        mMap.addMarker(new MarkerOptions().position(userCoordinates).
+                title(USER_LOCATION_STRING).icon(BitmapDescriptorFactory.
+                defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(userCoordinates));
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(userCoordinates, 16));
+    }
 
-            String[] result = latlngList.get(j).split(",");
-            LatLng placeOfInterest = new LatLng(Double.parseDouble(result[0]),Double.parseDouble(result[1]));
-            mMap.addMarker(new MarkerOptions().position(placeOfInterest).title(address[0]).snippet(address[1]));
+    private void addPlacesLocationMarkers(ArrayList<String> locationDetailsList,
+                                          ArrayList<String> coordinatesList) {
+        assert coordinatesList.size() == locationDetailsList.size();
 
-//            mMap.addMarker(new MarkerOptions().position(placeOfInterest).title(address[0] + "\r\n" + address[1]));
-//            mMap.moveCamera(CameraUpdateFactory.newLatLng(placeOfInterest));
+        for (int i = ARRAY_BASE_INDEX; i < coordinatesList.size(); i++){
+            String[] detailsOfLocation = locationDetailsList.get(i).split(NEW_LINE);
+            String[] coordinateValues = coordinatesList.get(i).split(COMMA);
 
+            LatLng coordinatesOfLocation = new LatLng(Double.parseDouble(coordinateValues[LATITUDE_INDEX]),
+                    Double.parseDouble(coordinateValues[LONGITUDE_INDEX]));
+
+            mMap.addMarker(new MarkerOptions().position(coordinatesOfLocation).
+                    title(detailsOfLocation[NAME_INDEX]).snippet(detailsOfLocation[ADDRESS_INDEX]));
         }
-
-
     }
 
     @Override

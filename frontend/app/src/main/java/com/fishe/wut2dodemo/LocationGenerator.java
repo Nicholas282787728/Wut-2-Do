@@ -17,6 +17,7 @@ import com.google.android.gms.location.LocationServices;
 /**
  * LocationGenerator generates the user's location by using Google Location API.
  */
+//TODO: Extend async?
 public class LocationGenerator implements
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
@@ -33,7 +34,7 @@ public class LocationGenerator implements
     private final Activity mActivity;
 
     /**
-     * Locks the thread in place while waiting for GoogleApiClient to finish connection.
+     * Used to lock the thread in place while waiting for GoogleApiClient to finish connection.
      */
     private static final Object mConnectionLock = new Object();
 
@@ -117,7 +118,11 @@ public class LocationGenerator implements
         }
     }
 
-    //TODO: Comments
+    /**
+     * Called after trying to resolve unsuccessful connection of GoogleApiClient.
+     * @param requestCode   Identifier for the request that was made.
+     * @param resultCode    Integer value of result for the activity.
+     */
     public void onCallerActivityResult(int requestCode, int resultCode) {
         switch (requestCode) {
             case CONNECTION_FAILURE_RESOLUTION_REQUEST:
@@ -133,9 +138,6 @@ public class LocationGenerator implements
                         break;
                 }
                 break;
-            default:
-                Log.i(mActivity.getLocalClassName(), "Resolution request code unidentified");
-                break;
         }
     }
 
@@ -146,6 +148,7 @@ public class LocationGenerator implements
     @Override
     public void onConnected(Bundle bundle) {
         assert mConnectionLock != null;
+
         Log.i(TAG, "GoogleApiClient connected.");
         try {
             retrievePreviousLocationIfAvailable();
@@ -216,7 +219,6 @@ public class LocationGenerator implements
     /**
      * Reconnects GoogleApiClient and request for location updates.
      */
-    //TODO: On resume, lock thread also.
     void resumeLocationUpdates() {
         if (!mGoogleApiClient.isConnected() && !mGoogleApiClient.isConnecting()) {
             Log.i(TAG, "Resuming GoogleApiClient connection.");

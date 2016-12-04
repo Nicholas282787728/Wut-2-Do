@@ -180,7 +180,7 @@ public abstract class LocationPermissionActivity extends AppCompatActivity
 
     /**
      * Checks whether location services is currently turned on.
-     * @return  Result on whether location services is currently turned on.
+     * @return  Pending result on whether location services is currently turned on.
      */
     private PendingResult<LocationSettingsResult> initialiseResult() {
         assert locationGenerator != null;
@@ -193,8 +193,13 @@ public abstract class LocationPermissionActivity extends AppCompatActivity
                 locationGenerator.getGoogleApiClient(), builder.build());
     }
 
-    //TODO: Understand this code and comments and assertions
+    /**
+     * Check user's current location settings status.
+     * @param result    Pending result on whether location services is currently turned on.
+     */
     private void setCallback(PendingResult<LocationSettingsResult> result) {
+        assert result != null;
+
         result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
             @Override
             public void onResult(@NonNull LocationSettingsResult result) {
@@ -205,7 +210,7 @@ public abstract class LocationPermissionActivity extends AppCompatActivity
                         break;
                     case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
                         Log.i(getLocalClassName(), "Location settings not granted.");
-                        tryResolving(status);
+                        tryToResolve(status);
                         break;
                     case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
                         Log.i(getLocalClassName(), "Location settings unable to be changed.");
@@ -220,7 +225,9 @@ public abstract class LocationPermissionActivity extends AppCompatActivity
              * @param status    Status on whether it is possible to request permission to turn on
              *                  location services for user.
              */
-            private void tryResolving(Status status) {
+            private void tryToResolve(Status status) {
+                assert status != null;
+
                 try {
                     if (status.hasResolution()) {
                         status.startResolutionForResult(
@@ -237,22 +244,21 @@ public abstract class LocationPermissionActivity extends AppCompatActivity
     }
 
     /**
-     *
+     * Called after trying to resolve location settings not granted.
      * @param requestCode   Identifier for the request that was made.
-     * @param resultCode
-     * @param data          The intent that
+     * @param resultCode    Integer value of result for the activity.
+     * @param data          The intent that called the activity.
      */
-    //TODO: Comments
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
             case LOCATION_SERVICES_NOT_GRANTED_RESOLUTION_REQUEST:
                 switch (resultCode) {
                     case Activity.RESULT_OK:
-                        Log.i(getLocalClassName(), "Location settings resolution success.");
+                        Log.i(getLocalClassName(), "Location settings now granted.");
                         break;
                     case Activity.RESULT_CANCELED:
-                        Log.i(getLocalClassName(), "Location settings resolution unsuccessful.");
+                        Log.i(getLocalClassName(), "Location settings still not granted.");
                         break;
                     default:
                         Log.i(getLocalClassName(), "Location settings resolution went wrong.");

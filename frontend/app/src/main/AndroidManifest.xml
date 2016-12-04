@@ -79,8 +79,8 @@
             android:label="Credits" />
         <activity
             android:name=".logic.user.QuestionUser3"
-            android:label="Question 3"></activity>
-        <activity android:name=".Tutorial"></activity>
+            android:label="Question 3" />
+        <activity android:name=".Tutorial" />
     </application>
 
 </manifest>

@@ -437,7 +437,7 @@ public class ResultPage extends LocationPermissionActivity implements LocationGe
                         extras.putString("location", temp.get(position));
 
                         i.putExtras(extras);
-//                        i.putExtra("latlng", latlngList.get(position));
+//                        i.putExtra("latlng", coordinatesList.get(position));
 
                         startActivity(i);
 
@@ -453,6 +453,11 @@ public class ResultPage extends LocationPermissionActivity implements LocationGe
         }
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        locationGenerator.onCallerActivityResult(requestCode, resultCode);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -471,7 +476,6 @@ public class ResultPage extends LocationPermissionActivity implements LocationGe
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
-                //TODO: Multithreading
                 locationGenerator.lockThreadUntilConnectionIsUp();
 
                 nameRe = (TextView)findViewById(R.id.resultPg);
