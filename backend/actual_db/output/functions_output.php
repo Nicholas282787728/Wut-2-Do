@@ -355,7 +355,7 @@ post: returns distance of user from location in km in 2d.p
 helper function */
 function getDistance($lat_long, $user_lat_long){
 	$link = "https://maps.googleapis.com/maps/api/distancematrix/json?origins=" . $user_lat_long .
-	"&destinations=" . $lat_long . "&key=AIzaSyDNXW5YCSJ31sIW1rxg8SW77BQ_b89I6qQ";
+	"&destinations=" . $lat_long . "&key=AIzaSyBFKQqaAG3tRGs8Pt7yWC2YFufREpj89l0";
 	$handle = file_get_contents($link);
 	$data = json_decode($handle, true);	
 
