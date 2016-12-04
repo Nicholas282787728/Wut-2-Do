@@ -27,6 +27,9 @@ public class MapView extends LocationPermissionActivity implements OnMapReadyCal
     private static final int NAME_INDEX = 0;
     private static final int ADDRESS_INDEX = 1;
     private static final int ARRAY_BASE_INDEX = 0;
+    public static final int STANDARD_MAP_ZOOM_IN_LEVEL = 16;
+    public static final String LATLNG_INTENT_STRING = "latlng";
+    public static final String LOCATION_INTENT_STRING = "location";
 
     private GoogleMap mMap;
     private LatLng userCoordinates;
@@ -61,8 +64,8 @@ public class MapView extends LocationPermissionActivity implements OnMapReadyCal
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         Intent intent = getIntent();
-        final ArrayList<String> locationDetailsList = intent.getStringArrayListExtra("latlng");
-        final ArrayList<String> coordinatesList = intent.getStringArrayListExtra("location");
+        final ArrayList<String> locationDetailsList = intent.getStringArrayListExtra(LATLNG_INTENT_STRING);
+        final ArrayList<String> coordinatesList = intent.getStringArrayListExtra(LOCATION_INTENT_STRING);
 
         new Thread(new Runnable() {
             @Override
@@ -73,6 +76,7 @@ public class MapView extends LocationPermissionActivity implements OnMapReadyCal
                     public void run() {
                         addUserLocationMarker();
                         addPlacesLocationMarkers(locationDetailsList, coordinatesList);
+                        moveToUserLocationMarker();
                     }
                 });
             }
@@ -83,8 +87,11 @@ public class MapView extends LocationPermissionActivity implements OnMapReadyCal
         mMap.addMarker(new MarkerOptions().position(userCoordinates).
                 title(USER_LOCATION_STRING).icon(BitmapDescriptorFactory.
                 defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+    }
+
+    private void moveToUserLocationMarker() {
         mMap.moveCamera(CameraUpdateFactory.newLatLng(userCoordinates));
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(userCoordinates, 16));
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(userCoordinates, STANDARD_MAP_ZOOM_IN_LEVEL));
     }
 
     private void addPlacesLocationMarkers(ArrayList<String> locationDetailsList,
