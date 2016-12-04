@@ -11,10 +11,8 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.View;
-import android.support.design.widget.Snackbar;
-import android.widget.TextView;
 
+import com.fishe.wut2dodemo.ui.messages.PopupMessage;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
@@ -40,15 +38,18 @@ public abstract class LocationPermissionActivity extends AppCompatActivity
             + "enjoy the full functionalities of our awesome application :(.";
     private static final String GRANT_PERMISSION_STRING = "GRANT PERMISSION";
 
+    private static final int TWO = 2;
     private static final int THREE = 3;
     public static final int LOCATION_SERVICES_NOT_GRANTED_RESOLUTION_REQUEST = 1000;
 
     protected LocationGenerator locationGenerator;
+    protected PopupMessage popupMessage;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         locationGenerator = new LocationGenerator(this, this);
+        popupMessage = PopupMessage.getInstance();
     }
 
     /**
@@ -71,7 +72,7 @@ public abstract class LocationPermissionActivity extends AppCompatActivity
     }
 
     /**
-     * Runs showPermissionGrantedMessage if permissions are granted. Else, shows a message to the user
+     * Runs showNormalMessage if permissions are granted. Else, shows a message to the user
      * to encourage user to grant permissions.
      * @param requestCode   Identifier for the request that was made.
      * @param permissions   The requested permissions.
@@ -84,17 +85,20 @@ public abstract class LocationPermissionActivity extends AppCompatActivity
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (isPermissionGranted()) {
             Log.i(getLocalClassName(), "Permission is granted with code:" + requestCode);
-            showPermissionGrantedMessage();
+            popupMessage.showNormalMessage(findViewById(android.R.id.content),
+                    PERMISSION_GRANTED_MESSAGE, TWO);
         } else {
             Log.i(getLocalClassName(), "Permission is not granted with code: " + requestCode);
             if (canPromptUserAgain()) {
                 Log.i(getLocalClassName(), "Showing request permission rationale.");
-                repromptUser(requestCode);
+                popupMessage.showMessageWithPermissionRequest(findViewById(android.R.id.content), FINE_LOCATION_PERMISSION,
+                        GRANT_PERMISSION_STRING, SUBSEQUENT_REQUEST_FOR_PERMISSION_MESSAGE,
+                        LocationPermissionActivity.this, THREE, requestCode);
             } else {
                 Log.i(getLocalClassName(), "User has selected \"Never ask again\" option.");
-                showPermissionPermanentlyNotGrantedMessage();
+                popupMessage.showNormalMessage(findViewById(android.R.id.content),
+                        STOP_REQUEST_FOR_PERMISSION_MESSAGE, THREE);
             }
-
         }
     }
 
@@ -106,67 +110,6 @@ public abstract class LocationPermissionActivity extends AppCompatActivity
     private boolean canPromptUserAgain() {
         return ActivityCompat.shouldShowRequestPermissionRationale(this,
                 android.Manifest.permission.ACCESS_FINE_LOCATION);
-    }
-
-    /**
-     * When user chooses to grant permission request, shows the user
-     * a message informing him that he / she has successfully granted permission.
-     */
-    private void showPermissionGrantedMessage() {
-        Snackbar.make(findViewById(android.R.id.content), PERMISSION_GRANTED_MESSAGE, Snackbar.LENGTH_LONG).show();
-    }
-
-    /**
-     * When user chooses not to grant permission request, shows the user
-     * a message informing that he / she is unable to enjoy full functionalities of the application
-     * and prompts the user to grant permission request.
-     * @param requestCode   Identifier for the request that was made.
-     */
-    private void repromptUser(final int requestCode) {
-        Snackbar snackbar =  Snackbar.make(findViewById(android.R.id.content),
-                SUBSEQUENT_REQUEST_FOR_PERMISSION_MESSAGE, Snackbar.LENGTH_LONG);
-        setSnackbarAction(snackbar, requestCode);
-        setSnackbarMaxLines(snackbar, THREE);
-        snackbar.show();
-    }
-
-    /**
-     * Sets a clickable action to the snackbar, allowing the user to grant permission on click.
-     * @param snackbar      The snackbar to add the clickable action to.
-     * @param requestCode   Identifier for the request that was made.
-     */
-    private void setSnackbarAction(Snackbar snackbar, final int requestCode) {
-        assert snackbar != null;
-
-        snackbar.setAction(GRANT_PERMISSION_STRING, new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                ActivityCompat.requestPermissions(LocationPermissionActivity.this,
-                        new String[]{FINE_LOCATION_PERMISSION}, requestCode);
-            }
-        });
-    }
-
-    /**
-     * Sets the maximum number of lines shown in snackbar to prevent truncation.
-     */
-    private void setSnackbarMaxLines(Snackbar snackbar, int maxLines) {
-        assert snackbar != null;
-
-        View snackbarView = snackbar.getView();
-        TextView textView= (TextView) snackbarView.findViewById(android.support.design.R.id.snackbar_text);
-        textView.setMaxLines(maxLines);
-    }
-
-    /**
-     * When user checks box "Never ask again" for the permission request, shows the user
-     * a message informing that he / she is unable to enjoy full functionalities of the application.
-     */
-    private void showPermissionPermanentlyNotGrantedMessage() {
-        Snackbar snackbar =  Snackbar.make(findViewById(android.R.id.content),
-                STOP_REQUEST_FOR_PERMISSION_MESSAGE, Snackbar.LENGTH_LONG);
-        setSnackbarMaxLines(snackbar, THREE);
-        snackbar.show();
     }
 
     /**
