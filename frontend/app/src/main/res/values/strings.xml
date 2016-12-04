@@ -27,7 +27,4 @@
 
     <string name="facebook_app_id">1796225557274923</string>
     <string name="title_activity_maps2">Map</string>
-
-    <string name="error_invalid_review">"Invalid review."</string>
-
 </resources>

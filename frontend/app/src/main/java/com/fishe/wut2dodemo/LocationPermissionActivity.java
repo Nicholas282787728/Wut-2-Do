@@ -38,18 +38,15 @@ public abstract class LocationPermissionActivity extends AppCompatActivity
             + "enjoy the full functionalities of our awesome application :(.";
     private static final String GRANT_PERMISSION_STRING = "GRANT PERMISSION";
 
-    private static final int TWO = 2;
     private static final int THREE = 3;
-    public static final int LOCATION_SERVICES_NOT_GRANTED_RESOLUTION_REQUEST = 1000;
+    private static final int LOCATION_SERVICES_NOT_GRANTED_RESOLUTION_REQUEST = 1000;
 
     protected LocationGenerator locationGenerator;
-    protected PopupMessage popupMessage;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         locationGenerator = new LocationGenerator(this, this);
-        popupMessage = PopupMessage.getInstance();
     }
 
     /**
@@ -85,21 +82,43 @@ public abstract class LocationPermissionActivity extends AppCompatActivity
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (isPermissionGranted()) {
             Log.i(getLocalClassName(), "Permission is granted with code:" + requestCode);
-            popupMessage.showNormalMessage(findViewById(android.R.id.content),
-                    PERMISSION_GRANTED_MESSAGE, TWO);
+            showPermissionGrantedMessage();
         } else {
             Log.i(getLocalClassName(), "Permission is not granted with code: " + requestCode);
             if (canPromptUserAgain()) {
-                Log.i(getLocalClassName(), "Showing request permission rationale.");
-                popupMessage.showMessageWithPermissionRequest(findViewById(android.R.id.content), FINE_LOCATION_PERMISSION,
-                        GRANT_PERMISSION_STRING, SUBSEQUENT_REQUEST_FOR_PERMISSION_MESSAGE,
-                        LocationPermissionActivity.this, THREE, requestCode);
+                Log.i(getLocalClassName(), "Showing request permission rationale and reprompting user.");
+                showRepromptMessage(requestCode);
             } else {
                 Log.i(getLocalClassName(), "User has selected \"Never ask again\" option.");
-                popupMessage.showNormalMessage(findViewById(android.R.id.content),
-                        STOP_REQUEST_FOR_PERMISSION_MESSAGE, THREE);
+                showPermissionPermanentlyNotGrantedMessage();
             }
         }
+    }
+
+    private void showRepromptMessage(int requestCode) {
+        new PopupMessage(findViewById(android.R.id.content), SUBSEQUENT_REQUEST_FOR_PERMISSION_MESSAGE)
+                .setMaxLines(THREE).setSnackbarAction(this, FINE_LOCATION_PERMISSION, GRANT_PERMISSION_STRING, requestCode)
+                .showMessage();
+        /*popupMessage.setMaxLines(THREE);
+        popupMessage.setSnackbarAction(this, FINE_LOCATION_PERMISSION, GRANT_PERMISSION_STRING, requestCode);
+        popupMessage.showMessage();*/
+    }
+
+    private void showPermissionPermanentlyNotGrantedMessage() {
+        new PopupMessage(findViewById(android.R.id.content), STOP_REQUEST_FOR_PERMISSION_MESSAGE)
+                .setMaxLines(THREE).showMessage();
+        /*PopupMessage popupMessage = new PopupMessage(findViewById(android.R.id.content),
+                STOP_REQUEST_FOR_PERMISSION_MESSAGE);
+        popupMessage.setMaxLines(THREE);
+        popupMessage.showMessage();*/
+    }
+
+    private void showPermissionGrantedMessage() {
+        new PopupMessage(findViewById(android.R.id.content), PERMISSION_GRANTED_MESSAGE)
+                .showMessage();
+        /*new PopupMessage(findViewById(android.R.id.content),
+                PERMISSION_GRANTED_MESSAGE);
+        popupMessage.showMessage();*/
     }
 
     /**

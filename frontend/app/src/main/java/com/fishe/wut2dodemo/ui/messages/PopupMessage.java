@@ -7,79 +7,42 @@ import android.view.View;
 import android.widget.TextView;
 
 /**
- * Creates the messages to be shown to the user.
+ * Creates and customizes the messages to be shown to the user. Works like a builder.
  */
 public class PopupMessage {
     private Snackbar snackbar;
-    private static PopupMessage ourInstance = new PopupMessage();
 
-    public static PopupMessage getInstance() {
-        return ourInstance;
-    }
-
-    private PopupMessage() {
-    }
-
-    public void prepareMessage(View view, String message, int numLines) {
+    /**
+     * Initialises snackbar with the message to be shown to the user.
+     * @param view      The view to show the snackbar message on.
+     * @param message   The message to be shown to user.
+     */
+    public PopupMessage(View view, String message) {
         snackbar = Snackbar.make(view, message, Snackbar.LENGTH_LONG);
     }
 
-    public void setMaxLines(Snackbar snackbar, int numLines) {
+    /**
+     * Sets the maximum number of lines shown in snackbar to prevent truncation.
+     * @param numLines  The number of lines to set to the snackbar.
+     */
+    public PopupMessage setMaxLines(int numLines) {
         assert snackbar != null;
 
         View snackbarView = snackbar.getView();
         TextView textView = (TextView) snackbarView.findViewById(android.support.design.R.id.snackbar_text);
         textView.setMaxLines(numLines);
+
+        return this;
     }
-
-    public void showMessage(Snackbar snackbar) {
-        snackbar.show();
-    }
-
-
-
-    /**
-     * Displays a normal message to the user.
-     * @param view      The view to show the snackbar message on.
-     * @param message   The message to be shown to user.
-     * @param numLines  The number of lines to show to prevent truncation.
-     */
-    public void showNormalMessage(View view, String message, int numLines) {
-        Snackbar snackbar = Snackbar.make(view, message, Snackbar.LENGTH_LONG);
-        setSnackbarMaxLines(snackbar, numLines);
-        snackbar.show();
-    }
-
-    /**
-     * When user chooses not to grant permission request, shows the user
-     * a message informing that he / she is unable to enjoy full functionalities of the application
-     * and prompts the user to grant permission request.
-     * Displays a normal message to the user.
-     * @param view              The view to show the snackbar message on.
-     * @param permission        The permission to request from the user.
-     * @param clickableMessage  The clickable message to be shown to user.
-     * @param message           The message to be shown to user.
-     * @param numLines          The number of lines to show to prevent truncation.
-     * @param requestCode       Identifier for the request that was made.
-     */
-    public void showMessageWithPermissionRequest(View view, String permission, String clickableMessage,
-                                                 String message, Activity activity, int numLines, final int requestCode) {
-        Snackbar snackbar =  Snackbar.make(view, message, Snackbar.LENGTH_LONG);
-        setSnackbarAction(snackbar, permission, clickableMessage, activity, requestCode);
-        setSnackbarMaxLines(snackbar, numLines);
-        snackbar.show();
-    }
-
     /**
      * Sets a clickable action to the snackbar, allowing the user to grant permission on click.
-     * @param snackbar          The snackbar to add the clickable action to.
+     * @param activity          The activity in which the user will see the prompt.
      * @param permission        The permission to request from the user.
      * @param clickableMessage  The clickable message to be shown to user.
-     * @param activity          The activity in which the user will be prompted.
      * @param requestCode       Identifier for the request that was made.
      */
-    private void setSnackbarAction(Snackbar snackbar, final String permission, String clickableMessage,
-                                   final Activity activity, final int requestCode) {
+    public PopupMessage setSnackbarAction(final Activity activity, final String permission,
+                                   String clickableMessage, final int requestCode) {
         assert snackbar != null;
 
         snackbar.setAction(clickableMessage, new View.OnClickListener() {
@@ -88,18 +51,11 @@ public class PopupMessage {
                 ActivityCompat.requestPermissions(activity, new String[]{permission}, requestCode);
             }
         });
+
+        return this;
     }
 
-    /**
-     * Sets the maximum number of lines shown in snackbar to prevent truncation.
-     * @param snackbar  The snackbar to set the number of lines to.
-     * @param numLines  The number of lines to set to the snackbar.
-     */
-    private void setSnackbarMaxLines(Snackbar snackbar, int numLines) {
-        assert snackbar != null;
-
-        View snackbarView = snackbar.getView();
-        TextView textView = (TextView) snackbarView.findViewById(android.support.design.R.id.snackbar_text);
-        textView.setMaxLines(numLines);
+    public void showMessage() {
+        snackbar.show();
     }
 }
