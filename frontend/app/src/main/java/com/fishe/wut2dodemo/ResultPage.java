@@ -477,6 +477,7 @@ public class ResultPage extends LocationPermissionActivity implements LocationGe
             @Override
             public void run() {
                 locationGenerator.lockThreadUntilConnectionIsUp();
+                //TODO: Lock thread until latlng is updated.
 
                 nameRe = (TextView)findViewById(R.id.resultPg);
                 String searchQuery = "";
