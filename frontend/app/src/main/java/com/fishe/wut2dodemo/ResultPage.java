@@ -3,19 +3,12 @@ package com.fishe.wut2dodemo;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.AsyncTask;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.PopupMenu;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,11 +19,7 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -40,13 +29,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+
+import static java.lang.Thread.sleep;
 
 
 class Details{
@@ -229,7 +219,8 @@ class DetailRAdapter extends ArrayAdapter<DetailReview> {
 }
 
 
-public class ResultPage extends AppCompatActivity{
+public class ResultPage extends LocationPermissionActivity implements LocationGenerator.LocationUpdate {
+    public static final String TAG = ResultPage.class.getSimpleName();
     ListView listView;
     ArrayList<Details> itemList;
     ArrayList<String> latlngList;
@@ -244,16 +235,15 @@ public class ResultPage extends AppCompatActivity{
     HashMap<String,Integer> map;
     ArrayList<String> name;
     RandomChoose randomChoose;
+    private LatLng userCoordinates;
 
-    // location variables
-    private GoogleApiClient mGoogleApiClient; // to access Google API
-    private Location mLastLocation; // last location of user
-    private double mLatitude; // converted to lat and long
-    private double mLongitude;
-    private LocationRequest mLocationRequest; // set the frequency of getting location request
-    private boolean mRequestingLocationUpdates = true; // to constantly receive location updates
-    double lat;
-    double lng;
+    @Override
+    public void updateLocation(Location location) {
+        Log.i(TAG, "Location is being updated.");
+        double latitude = location.getLatitude();
+        double longitude = location.getLongitude();
+        userCoordinates = new LatLng(latitude, longitude);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -274,8 +264,6 @@ public class ResultPage extends AppCompatActivity{
                 Bundle extras = new Bundle();
                 extras.putStringArrayList("latlng", latlngList);
                 extras.putStringArrayList("location", temp);
-                extras.putDouble("lat",lat);
-                extras.putDouble("lng",lng);
 
                 i.putExtras(extras);
                 startActivity(i);
@@ -351,7 +339,7 @@ public class ResultPage extends AppCompatActivity{
         protected String doInBackground(String... urls) {
             String result = "";
             URL url;
-            HttpURLConnection urlConnection = null;
+            HttpURLConnection urlConnection;
 
             try {
                 url = new URL(urls[0]);
@@ -377,8 +365,6 @@ public class ResultPage extends AppCompatActivity{
                 }
 
 
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -404,7 +390,7 @@ public class ResultPage extends AppCompatActivity{
                 locationDetails = new ArrayList<String>();
                 sorting = new ArrayList<DetailReview>();
 
-                for(int i =0; i< array.length(); i++){
+                for(int i = 0; i< array.length(); i++){
                     try {
                         JSONObject jsonPart = array.getJSONObject(i);
                         temp.add(jsonPart.getString("name")+ "\r\n" + jsonPart.getString("address")
@@ -449,11 +435,9 @@ public class ResultPage extends AppCompatActivity{
                         extras.putString("latlng",latlngList.get(position));
                         extras.putString("info", locationDetails.get(position));
                         extras.putString("location", temp.get(position));
-                        extras.putDouble("lat",lat);
-                        extras.putDouble("lng",lng);
 
                         i.putExtras(extras);
-//                        i.putExtra("latlng", latlngList.get(position));
+//                        i.putExtra("latlng", coordinatesList.get(position));
 
                         startActivity(i);
 
@@ -469,22 +453,31 @@ public class ResultPage extends AppCompatActivity{
         }
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        locationGenerator.onCallerActivityResult(requestCode, resultCode);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_result_page);
 
+        requestAppPermissions(9998);
+        requestTurnOnGps();
+
         dialog = new ProgressDialog(this);
         dialog.setMessage("Downloading information ");
         dialog.setCancelable(false);
         dialog.setInverseBackgroundForced(false);
-        dialog.show();
+        dialog.show(); // on main thread
 
-        Runnable runnable = new Runnable() {
+        new Thread(locationGenerator.generateUnlockRunnable()).start();
+        new Thread(new Runnable() {
             @Override
             public void run() {
-
+                locationGenerator.lockThreadUntilLocationIsGenerated();
                 nameRe = (TextView)findViewById(R.id.resultPg);
                 String searchQuery = "";
                 category = "";
@@ -492,28 +485,21 @@ public class ResultPage extends AppCompatActivity{
                 Bundle extras = getIntent().getExtras();
                 String code = extras.getString("code");
 
-                lat = extras.getDouble("lat");
-                lng = extras.getDouble("lng");
-
                 Log.i("Code", code);
-                if(code.equals("category")) {
-                    nameRe.setText(extras.getString("name"));
+                if (code.equals("category")) {
+                    postToUi(extras.getString("name"));
                     //ensure the string is in proper format to be passed into url
                     category = extras.getString("name").toLowerCase();
                     category = category.replace(" ","+");
 
                     String url = "http://orbital_wut_2_do.net16.net/copy/output/show_details.php?category=" + category
-                            +"&latlong="+lat+","+lng;
-
+                            +"&latlong="+userCoordinates.latitude+"," + userCoordinates.longitude;
                     Log.i("URL category", url);
 
                     DownloadTask task = new DownloadTask();
 
-
                     try {
-
                         task.execute(url).get();
-
                     } catch (InterruptedException e) {
                         Log.i("Interrupted", category);
                         e.printStackTrace();
@@ -521,26 +507,21 @@ public class ResultPage extends AppCompatActivity{
                         e.printStackTrace();
                         Log.i("Execution", category);
                     }
-                }
-
-                else if(code.equals("search")){
+                } else if (code.equals("search")){
                     searchQuery = extras.getString("name");
                     searchQuery = searchQuery.replace("+"," ");
                     searchQuery = toUpperCase(searchQuery);
-
-                    nameRe.setText(searchQuery);
-
+                    postToUi(searchQuery);
                     searchResult = extras.getString("name").toLowerCase();
                     searchResult = searchResult.replace(" ","+");
                     String url = "http://orbital_wut_2_do.net16.net/copy/output/show_search.php?search=" + searchResult
-                            +"&latlong="+lat+","+lng;
+                            +"&latlong="+userCoordinates.latitude+","+userCoordinates.longitude;
                     Log.i("URL search", url);
 
                     DownloadTask task = new DownloadTask();
 
                     try {
                         task.execute(url).get();
-
                     } catch (InterruptedException e) {
                         Log.i("Interrupted", category);
                         e.printStackTrace();
@@ -548,24 +529,22 @@ public class ResultPage extends AppCompatActivity{
                         e.printStackTrace();
                         Log.i("Execution", category);
                     }
-                }
-                //random result here
-                else {
+                } else if (code.equals("random")) {
+                    Log.i(TAG, "Choosing");
                     randomChoose = new RandomChoose(getApplicationContext());
                     category = randomChoose.getRandomCategory();
                     Log.i("Random", category);
-                    nameRe.setText(category);
+                    postToUi(category);
                     category = category.toLowerCase();
                     category = category.replace(" ","+");
                     String url = "http://orbital_wut_2_do.net16.net/copy/output/show_details.php?category=" + category
-                            +"&latlong="+lat+","+lng;
+                            +"&latlong="+userCoordinates.latitude+","+userCoordinates.longitude;
                     Log.i("URL search", url);
 
                     DownloadTask task = new DownloadTask();
 
                     try {
                         task.execute(url).get();
-
                     } catch (InterruptedException e) {
                         Log.i("Interrupted", category);
                         e.printStackTrace();
@@ -577,10 +556,16 @@ public class ResultPage extends AppCompatActivity{
                 // after finishing, close the progress bar
                 dialog.dismiss();
             }
-        };
 
-        new Thread(runnable).start();
-
+            private void postToUi(final String words) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        nameRe.setText(words);
+                    }
+                });
+            }
+        }).start();
     }
 
     //convert the first letter of each word to uppercase
@@ -595,4 +580,30 @@ public class ResultPage extends AppCompatActivity{
         return sb.toString().trim();
     }
 
+    @Override
+    protected void onResume() {
+        Log.i(TAG, "Resuming activity.");
+        if (locationGenerator != null) {
+            locationGenerator.resumeLocationUpdates();
+        }
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        Log.i(TAG, "Pausing activity.");
+        if (locationGenerator != null) {
+            locationGenerator.pauseLocationUpdates();
+        }
+        super.onPause();
+    }
+
+    @Override
+    protected void onStop() {
+        Log.i(TAG, "Stopping activity.");
+        if (locationGenerator != null) {
+            locationGenerator.stopLocationUpdates();
+        }
+        super.onStop();
+    }
 }

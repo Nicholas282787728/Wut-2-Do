@@ -1,8 +1,8 @@
-package com.fishe.wut2dodemo;
+package com.fishe.wut2dodemo.logic.user;
 
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -21,7 +21,18 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 
-public class SignupActivity extends AppCompatActivity {
+import com.fishe.wut2dodemo.R;
+import com.fishe.wut2dodemo.model.user.SaveSharedPreference;
+
+/**
+ * A login screen that offers login via email/password.
+ */
+public class LoginActivity extends AppCompatActivity {
+    /**
+     * Keep track of the login task to ensure we can cancel it if requested.
+     */
+    private UserLoginTask mAuthTask = null;
+
     // UI references.
     private EditText mUserView;
     private EditText mPasswordView;
@@ -29,7 +40,7 @@ public class SignupActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_signup);
+        setContentView(R.layout.activity_login);
         // Set up the login form.
         mUserView = (EditText) findViewById(R.id.username);
         mPasswordView = (EditText) findViewById(R.id.password);
@@ -40,7 +51,7 @@ public class SignupActivity extends AppCompatActivity {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
                 if (id == R.id.login_button || id == EditorInfo.IME_NULL) {
-                    attemptSignup(textView);
+                    attemptLogin(textView);
                     return true;
                 }
                 return false;
@@ -49,11 +60,15 @@ public class SignupActivity extends AppCompatActivity {
     }
 
     /**
-     * Attempts to register the account specified by the login form.
+     * Attempts to sign in or register the account specified by the login form.
      * If there are form errors (invalid email, missing fields, etc.), the
-     * errors are presented and no registration is made.
+     * errors are presented and no actual login attempt is made.
      */
-    public void attemptSignup(View view) {
+    public void attemptLogin(View view) {
+        if (mAuthTask != null) {
+            return;
+        }
+
         // Reset errors.
         mUserView.setError(null);
         mPasswordView.setError(null);
@@ -80,34 +95,41 @@ public class SignupActivity extends AppCompatActivity {
         }
 
         if (cancel) {
-            // There was an error; don't attempt register and focus the first
+            // There was an error; don't attempt login and focus the first
             // form field with an error.
             focusView.requestFocus();
         } else {
-            // perform the user registration attempt.
-            new UserSignupTask(username, password).execute();
+            // perform the user login attempt.
+            mAuthTask = new UserLoginTask(username, password);
+            mAuthTask.execute();
         }
+    }
+
+    public void signup(View view) {
+        Intent i = new Intent(getApplicationContext(), SignupActivity.class);
+        finish();
+        startActivity(i);
     }
 
     /**
      * Represents an asynchronous login/registration task used to authenticate
      * the user.
      */
-    public class UserSignupTask extends AsyncTask<Boolean, Boolean, Boolean> {
+    public class UserLoginTask extends AsyncTask<Void, String, Boolean> {
 
         private final String mUsername;
         private final String mPassword;
         private HttpURLConnection con;
         public static final String USER_AGENT = "Mozilla/5.0";
-        public static final String mUrl = "http://orbital_wut_2_do.net16.net/copy/login/signup.php";
+        public static final String mUrl = "http://orbital_wut_2_do.net16.net/copy/login/login.php";
 
-        UserSignupTask(String username, String password) {
+        UserLoginTask(String username, String password) {
             mUsername = username;
             mPassword = password;
         }
 
         @Override
-        protected Boolean doInBackground(Boolean... unused) {
+        protected Boolean doInBackground(Void... unused) {
             try {
                 // connect to web page
                 URL url = new URL(mUrl);
@@ -137,10 +159,16 @@ public class SignupActivity extends AppCompatActivity {
                 BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
                 String response = in.readLine();
                 in.close();
-                Log.i("Result", response);
-
-                return response.equals("Account successfully created.");
-            }catch (UnsupportedEncodingException e) {
+                Log.i("Result : ", response);
+                if(response.equals("Log in successful.")) {
+                    SaveSharedPreference.setUserName(getApplicationContext(),mUsername);
+                    SaveSharedPreference.setPassWord(getApplicationContext(),mPassword);
+                    SaveSharedPreference.login(getApplicationContext(),"true");
+                    return true;
+                } else{
+                    return false;
+                }
+            } catch (UnsupportedEncodingException e) {
                 Log.i("1st Gone", e.toString());
             } catch (IOException e) {
                 Log.i("2nd Gone", e.toString());
@@ -150,19 +178,22 @@ public class SignupActivity extends AppCompatActivity {
         }
 
         @Override
-        protected void onPostExecute(Boolean response) {
+        protected void onPostExecute(final Boolean response) {
+            mAuthTask = null;
+
             if (response) {
-                // TODO: Auto log-in and direct to main page
-                SaveSharedPreference.setUserName(getApplicationContext(),mUsername);
-                SaveSharedPreference.setPassWord(getApplicationContext(),mPassword);
-                SaveSharedPreference.login(getApplicationContext(),"true");
+                // TODO: stay logged in
                 finish();
-                Intent i = new Intent(getApplicationContext(), QuestionUser.class);
-                startActivity(i);
             } else {
-                mUserView.setError(getString(R.string.error_sign_up));
+                mUserView.setError(getString(R.string.error_log_in));
                 mUserView.requestFocus();
             }
         }
+
+        @Override
+        protected void onCancelled() {
+            mAuthTask = null;
+        }
     }
 }
+

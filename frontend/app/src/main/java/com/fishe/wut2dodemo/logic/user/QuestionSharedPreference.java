@@ -1,14 +1,11 @@
-package com.fishe.wut2dodemo;
+package com.fishe.wut2dodemo.logic.user;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.location.Location;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.widget.ArrayAdapter;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class QuestionSharedPreference {
 

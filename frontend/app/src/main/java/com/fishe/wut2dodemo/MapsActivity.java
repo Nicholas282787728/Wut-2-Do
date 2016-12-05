@@ -2,13 +2,11 @@ package com.fishe.wut2dodemo;
 
 import android.content.Context;
 import android.content.Intent;
-import android.location.Address;
-import android.location.Geocoder;
+import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -20,8 +18,9 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.RatingBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.fishe.wut2dodemo.logic.user.LoginActivity;
+import com.fishe.wut2dodemo.model.user.SaveSharedPreference;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -42,17 +41,16 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 class DetailMapReview implements Comparable<DetailReview> {
-    String name;
-    String date;
-    String review;
-    double avg_review;
-    String text;
+    private String name;
+    private String date;
+    private String review;
+    private double avg_review;
+    private String text;
 
     public DetailMapReview(JSONObject object){
         /*
@@ -86,15 +84,6 @@ class DetailMapReview implements Comparable<DetailReview> {
     public String getText() {
         return text;
     }
-
-    public String getReview() {
-        if(review.equals("0")){
-            return "-";
-        }else{
-            return review;
-        }
-    }
-
     public float getAvg(){ return (float) avg_review;}
 
     public int compareTo(DetailReview other) {
@@ -162,11 +151,12 @@ class DetailMapAdapter extends ArrayAdapter<DetailMapReview> {
     }
 }
 
-public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class MapsActivity extends LocationPermissionActivity implements OnMapReadyCallback, LocationGenerator.LocationUpdate {
 
+    public static final String TAG = MapsActivity.class.getSimpleName();
     ListView listView, listView2;
     private GoogleMap mMap;
-    double lat=0,lng=0;
+    private LatLng userCoordinates;
     String address;
     String postal;
     String latlng;
@@ -178,6 +168,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     ArrayList<String> reviewList;
     ArrayList<DetailMapReview> itemList;
     String[] addressResult;
+
+    @Override
+    public void updateLocation(Location location) {
+        double latitude = location.getLatitude();
+        double longitude = location.getLongitude();
+        userCoordinates = new LatLng(latitude, longitude);
+    }
+
     public class DownloadTask extends AsyncTask<String,Void,String> {
 
         @Override
@@ -256,10 +254,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+        requestAppPermissions(9998);
+        requestTurnOnGps();
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
 
     }
     @Override
@@ -309,7 +310,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
     @Override
-    public void onMapReady(GoogleMap googleMap) {
+    public void onMapReady(final GoogleMap googleMap) {
         mMap = googleMap;
         Intent receive = getIntent();
         latlng = receive.getStringExtra("latlng");
@@ -323,27 +324,25 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         Log.i("shop name", addressName);
 
         addressName = addressResult[0].toLowerCase();
-        Log.wtf("shopv2 name", addressName);
+        Log.i("shopv2 name", addressName);
 
-        addressName = addressName.replace(" ","+");
-        Log.d("shopv3 name", addressName);
+        addressName = addressName.replace(" ", "+");
+        Log.i("shopv3 name", addressName);
 
         //  final ArrayList<String>
-        temp = new ArrayList<String >();
-        if(locationinformation[0].trim().isEmpty()){
+        temp = new ArrayList<String>();
+        if (locationinformation[0].trim().isEmpty()) {
             locationinformation[0] = "Website: N/A";
         }
 
-        for(int i = 0;i<locationinformation.length;i++){
+        for (int i = 0; i < locationinformation.length; i++) {
             temp.add(locationinformation[i]);
         }
 
-
-        url = "http://orbital_wut_2_do.net16.net/copy/output/show_reviews.php?postal_code=" + postal + "&unit_no="+ unit_no +
-        "&shop_name=" + addressName;
+        url = "http://orbital_wut_2_do.net16.net/copy/output/show_reviews.php?postal_code=" + postal + "&unit_no=" + unit_no +
+                "&shop_name=" + addressName;
         //url = "http://orbital_wut_2_do.net16.net/copy/output/show_reviews.php?shop_name="
-          //     +"east+coast+park"+"&unit_no=&postal_code=449876";
-
+        //     +"east+coast+park"+"&unit_no=&postal_code=449876";
 
         DownloadTask task = new DownloadTask();
 
@@ -360,13 +359,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, temp);
         listView = (ListView) findViewById(R.id.listView);
         listView.setAdapter(arrayAdapter);
-
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String web = temp.get(position);
-                if(position==0){
-                    if(!web.equals("Website: N/A")) {
+                if (position == 0) {
+                    if (!web.equals("Website: N/A")) {
                         Uri uri = Uri.parse(temp.get(position));
                         Log.i("Check", "Test");
                         Intent browserIntent = new Intent(Intent.ACTION_VIEW, uri);
@@ -385,20 +383,26 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
         String[] result = latlng.split(",");
-        Bundle extras = getIntent().getExtras();
-        double lat = extras.getDouble("lat");
-        double lng = extras.getDouble("lng");
+        Runnable runnable = getRunnable(result);
+        new Thread(locationGenerator.generateLockRunnable(runnable)).start();
+        new Thread(locationGenerator.generateUnlockRunnable()).start();
+    }
 
-
-        LatLng userlocation = new LatLng(lat,lng);
-        mMap.addMarker(new MarkerOptions().position(userlocation).
-                title("User location").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
-
-        LatLng placeOfInterest = new LatLng(Double.parseDouble(result[0]),Double.parseDouble(result[1]));
-        mMap.addMarker(new MarkerOptions().position(placeOfInterest).title(addressResult[0]).snippet(addressResult[1]));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(placeOfInterest));
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(placeOfInterest,16));
-
+    @NonNull
+    private Runnable getRunnable(final String[] result) {
+        return new Runnable() {
+                @Override
+                public void run() {
+                    mMap.addMarker(new MarkerOptions().position(userCoordinates).
+                            title("User location").icon(BitmapDescriptorFactory
+                            .defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+                    LatLng placeOfInterest = new LatLng(Double.parseDouble(result[0]), Double.parseDouble(result[1]));
+                    mMap.addMarker(new MarkerOptions().position(placeOfInterest).title(addressResult[0])
+                            .snippet(addressResult[1]));
+                    mMap.moveCamera(CameraUpdateFactory.newLatLng(placeOfInterest));
+                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(placeOfInterest, 16));
+                }
+            };
     }
 
     public String findPostal(String str){
@@ -429,6 +433,39 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         } else {
             return "";
         }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        locationGenerator.onCallerActivityResult(requestCode, resultCode);
+    }
+
+    @Override
+    protected void onResume() {
+        Log.i(TAG, "Resuming activity.");
+        if (locationGenerator != null) {
+            locationGenerator.resumeLocationUpdates();
+        }
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        Log.i(TAG, "Pausing activity.");
+        if (locationGenerator != null) {
+            locationGenerator.pauseLocationUpdates();
+        }
+        super.onPause();
+    }
+
+    @Override
+    protected void onStop() {
+        Log.i(TAG, "Stopping activity.");
+        if (locationGenerator != null) {
+            locationGenerator.stopLocationUpdates();
+        }
+        super.onStop();
     }
 }
 /*

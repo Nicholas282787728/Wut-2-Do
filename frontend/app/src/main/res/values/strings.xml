@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Wut 2 Do??</string>
+    <string name="app_name">Wut 2 Do?</string>
     <string name="title_activity_maps">Map</string>
     <string name="title_activity_map_view">Map</string>
     <string name="title_activity_login">Sign in</string>
@@ -26,6 +26,5 @@
     <string name="error_invalid_review">"Invalid review."</string>
 
     <string name="facebook_app_id">1796225557274923</string>
-
-
+    <string name="title_activity_maps2">Map</string>
 </resources>
