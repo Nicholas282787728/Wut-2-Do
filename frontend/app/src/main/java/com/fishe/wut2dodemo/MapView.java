@@ -69,7 +69,7 @@ public class MapView extends LocationPermissionActivity implements OnMapReadyCal
         final ArrayList<String> locationDetailsList = intent.getStringArrayListExtra(LOCATION_INTENT_STRING);
         final ArrayList<String> coordinatesList = intent.getStringArrayListExtra(LATLNG_INTENT_STRING);
 
-        final Runnable addingMapMarkers = generateAddingMapMarkersRunnable(locationDetailsList, coordinatesList);
+        Runnable addingMapMarkers = generateAddingMapMarkersRunnable(locationDetailsList, coordinatesList);
         new Thread(locationGenerator.generateLockRunnable(addingMapMarkers)).start();
         new Thread(locationGenerator.generateUnlockRunnable()).start();
     }

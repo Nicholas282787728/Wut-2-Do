@@ -6,6 +6,7 @@ import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -381,27 +382,27 @@ public class MapsActivity extends LocationPermissionActivity implements OnMapRea
         });
 
 
-        final String[] result = latlng.split(",");
+        String[] result = latlng.split(",");
+        Runnable runnable = getRunnable(result);
+        new Thread(locationGenerator.generateLockRunnable(runnable)).start();
+        new Thread(locationGenerator.generateUnlockRunnable()).start();
+    }
 
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                locationGenerator.lockThreadUntilConnectionIsUp();
-
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        mMap.addMarker(new MarkerOptions().position(userCoordinates).
-                                title("User location").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
-                        LatLng placeOfInterest = new LatLng(Double.parseDouble(result[0]), Double.parseDouble(result[1]));
-                        mMap.addMarker(new MarkerOptions().position(placeOfInterest).title(addressResult[0]).snippet(addressResult[1]));
-                        mMap.moveCamera(CameraUpdateFactory.newLatLng(placeOfInterest));
-                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(placeOfInterest, 16));
-                    }
-                });
-            }
-        };
-        new Thread(runnable).start();
+    @NonNull
+    private Runnable getRunnable(final String[] result) {
+        return new Runnable() {
+                @Override
+                public void run() {
+                    mMap.addMarker(new MarkerOptions().position(userCoordinates).
+                            title("User location").icon(BitmapDescriptorFactory
+                            .defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+                    LatLng placeOfInterest = new LatLng(Double.parseDouble(result[0]), Double.parseDouble(result[1]));
+                    mMap.addMarker(new MarkerOptions().position(placeOfInterest).title(addressResult[0])
+                            .snippet(addressResult[1]));
+                    mMap.moveCamera(CameraUpdateFactory.newLatLng(placeOfInterest));
+                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(placeOfInterest, 16));
+                }
+            };
     }
 
     public String findPostal(String str){

@@ -473,12 +473,11 @@ public class ResultPage extends LocationPermissionActivity implements LocationGe
         dialog.setInverseBackgroundForced(false);
         dialog.show(); // on main thread
 
-        Runnable runnable = new Runnable() {
+        new Thread(locationGenerator.generateUnlockRunnable()).start();
+        new Thread(new Runnable() {
             @Override
             public void run() {
-                locationGenerator.lockThreadUntilConnectionIsUp();
-                //TODO: Lock thread until latlng is updated.
-
+                locationGenerator.lockThreadUntilLocationIsGenerated();
                 nameRe = (TextView)findViewById(R.id.resultPg);
                 String searchQuery = "";
                 category = "";
@@ -486,28 +485,21 @@ public class ResultPage extends LocationPermissionActivity implements LocationGe
                 Bundle extras = getIntent().getExtras();
                 String code = extras.getString("code");
 
-
                 Log.i("Code", code);
-                if(code.equals("category")) {
-                    runOnUi(extras.getString("name"));
+                if (code.equals("category")) {
+                    postToUi(extras.getString("name"));
                     //ensure the string is in proper format to be passed into url
                     category = extras.getString("name").toLowerCase();
                     category = category.replace(" ","+");
-                    /*while (userCoordinates == null) {
-                        Log.i("i", "i");
-                    }*/
+
                     String url = "http://orbital_wut_2_do.net16.net/copy/output/show_details.php?category=" + category
                             +"&latlong="+userCoordinates.latitude+"," + userCoordinates.longitude;
-
                     Log.i("URL category", url);
 
                     DownloadTask task = new DownloadTask();
 
-
                     try {
-
                         task.execute(url).get();
-
                     } catch (InterruptedException e) {
                         Log.i("Interrupted", category);
                         e.printStackTrace();
@@ -515,14 +507,11 @@ public class ResultPage extends LocationPermissionActivity implements LocationGe
                         e.printStackTrace();
                         Log.i("Execution", category);
                     }
-                }
-
-                else if(code.equals("search")){
+                } else if (code.equals("search")){
                     searchQuery = extras.getString("name");
                     searchQuery = searchQuery.replace("+"," ");
                     searchQuery = toUpperCase(searchQuery);
-                    runOnUi(searchQuery);
-
+                    postToUi(searchQuery);
                     searchResult = extras.getString("name").toLowerCase();
                     searchResult = searchResult.replace(" ","+");
                     String url = "http://orbital_wut_2_do.net16.net/copy/output/show_search.php?search=" + searchResult
@@ -533,7 +522,6 @@ public class ResultPage extends LocationPermissionActivity implements LocationGe
 
                     try {
                         task.execute(url).get();
-
                     } catch (InterruptedException e) {
                         Log.i("Interrupted", category);
                         e.printStackTrace();
@@ -541,14 +529,12 @@ public class ResultPage extends LocationPermissionActivity implements LocationGe
                         e.printStackTrace();
                         Log.i("Execution", category);
                     }
-                }
-                //random result here
-                else {
+                } else if (code.equals("random")) {
                     Log.i(TAG, "Choosing");
                     randomChoose = new RandomChoose(getApplicationContext());
                     category = randomChoose.getRandomCategory();
                     Log.i("Random", category);
-                    runOnUi(category);
+                    postToUi(category);
                     category = category.toLowerCase();
                     category = category.replace(" ","+");
                     String url = "http://orbital_wut_2_do.net16.net/copy/output/show_details.php?category=" + category
@@ -559,7 +545,6 @@ public class ResultPage extends LocationPermissionActivity implements LocationGe
 
                     try {
                         task.execute(url).get();
-
                     } catch (InterruptedException e) {
                         Log.i("Interrupted", category);
                         e.printStackTrace();
@@ -572,7 +557,7 @@ public class ResultPage extends LocationPermissionActivity implements LocationGe
                 dialog.dismiss();
             }
 
-            private void runOnUi(final String words) {
+            private void postToUi(final String words) {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -580,8 +565,7 @@ public class ResultPage extends LocationPermissionActivity implements LocationGe
                     }
                 });
             }
-        };
-        new Thread(runnable).start();
+        }).start();
     }
 
     //convert the first letter of each word to uppercase
