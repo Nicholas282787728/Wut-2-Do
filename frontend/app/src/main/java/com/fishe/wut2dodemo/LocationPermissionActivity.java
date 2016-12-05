@@ -99,26 +99,16 @@ public abstract class LocationPermissionActivity extends AppCompatActivity
         new PopupMessage(findViewById(android.R.id.content), SUBSEQUENT_REQUEST_FOR_PERMISSION_MESSAGE)
                 .setMaxLines(THREE).setSnackbarAction(this, FINE_LOCATION_PERMISSION, GRANT_PERMISSION_STRING, requestCode)
                 .showMessage();
-        /*popupMessage.setMaxLines(THREE);
-        popupMessage.setSnackbarAction(this, FINE_LOCATION_PERMISSION, GRANT_PERMISSION_STRING, requestCode);
-        popupMessage.showMessage();*/
     }
 
     private void showPermissionPermanentlyNotGrantedMessage() {
         new PopupMessage(findViewById(android.R.id.content), STOP_REQUEST_FOR_PERMISSION_MESSAGE)
                 .setMaxLines(THREE).showMessage();
-        /*PopupMessage popupMessage = new PopupMessage(findViewById(android.R.id.content),
-                STOP_REQUEST_FOR_PERMISSION_MESSAGE);
-        popupMessage.setMaxLines(THREE);
-        popupMessage.showMessage();*/
     }
 
     private void showPermissionGrantedMessage() {
         new PopupMessage(findViewById(android.R.id.content), PERMISSION_GRANTED_MESSAGE)
                 .showMessage();
-        /*new PopupMessage(findViewById(android.R.id.content),
-                PERMISSION_GRANTED_MESSAGE);
-        popupMessage.showMessage();*/
     }
 
     /**
