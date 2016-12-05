@@ -21,6 +21,7 @@ import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 
+//@@author A0139655U
 /**
  * Abstract parent class containing the methods required to request location permission from user.
  * Activities that require location permission can inherit from this class.

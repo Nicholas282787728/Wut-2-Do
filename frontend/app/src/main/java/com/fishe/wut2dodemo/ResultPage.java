@@ -259,7 +259,7 @@ public class ResultPage extends LocationPermissionActivity implements LocationGe
         switch (item.getItemId()) {
             case R.id.mapV:{
                 Toast.makeText(this,"Changed to : " + item.getTitle(),Toast.LENGTH_SHORT).show();
-                Intent i = new Intent(getApplicationContext(), MapView.class);
+                Intent i = new Intent(getApplicationContext(), MapViewActivity.class);
 
                 Bundle extras = new Bundle();
                 extras.putStringArrayList("latlng", latlngList);

@@ -16,9 +16,14 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
 
-public class MapView extends LocationPermissionActivity implements OnMapReadyCallback, LocationGenerator.LocationUpdate {
+//@@author A0139655U
 
-    private static final String TAG = MapView.class.getSimpleName();
+/**
+ * Shows the list of locations denoted as markers on Google Maps.
+ */
+public class MapViewActivity extends LocationPermissionActivity implements OnMapReadyCallback, LocationGenerator.LocationUpdate {
+
+    private static final String TAG = MapViewActivity.class.getSimpleName();
 
     private static final String USER_LOCATION_STRING = "User Location";
     private static final String NEW_LINE = "\n";
@@ -32,7 +37,7 @@ public class MapView extends LocationPermissionActivity implements OnMapReadyCal
     private static final int ADDRESS_INDEX = 1;
     private static final int ARRAY_BASE_INDEX = 0;
     private static final int STANDARD_MAP_ZOOM_IN_LEVEL = 16;
-    public static final int REQUEST_CODE_APP_PERMISSIONS = 9998;
+    private static final int REQUEST_CODE_APP_PERMISSIONS = 9998;
 
     private GoogleMap mMap;
     private LatLng userCoordinates;
@@ -48,7 +53,6 @@ public class MapView extends LocationPermissionActivity implements OnMapReadyCal
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map_view);
-
         requestAppPermissions(REQUEST_CODE_APP_PERMISSIONS);
         requestTurnOnGps();
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()

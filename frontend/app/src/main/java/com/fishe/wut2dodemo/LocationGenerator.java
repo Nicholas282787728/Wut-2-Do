@@ -14,6 +14,7 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
+//@@author A0139655U
 /**
  * LocationGenerator generates the user's location by using Google Location API.
  */

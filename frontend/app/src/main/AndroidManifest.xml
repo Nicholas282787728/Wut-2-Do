@@ -57,7 +57,7 @@
             android:name=".MapsActivity"
             android:label="@string/title_activity_maps" />
         <activity
-            android:name=".MapView"
+            android:name=".MapViewActivity"
             android:label="@string/title_activity_map_view" />
         <activity
             android:name=".logic.user.LoginActivity"

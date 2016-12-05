@@ -6,6 +6,7 @@ import android.support.v4.app.ActivityCompat;
 import android.view.View;
 import android.widget.TextView;
 
+//@@author A0139655U
 /**
  * Creates and customizes the messages to be shown to the user. Works like a builder.
  */
